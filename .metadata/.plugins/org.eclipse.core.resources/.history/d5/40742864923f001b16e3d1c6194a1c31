@@ -20,10 +20,10 @@ public class People {
     		while(rs.next() ) {
     			System.out.println(rs.getInt("age"));
     			id = rs.getInt("id"); 
-    			String name = rs.getString("name"); 
+    			String name = rs.getString("name");
     			System.out.println(rs.getString("name"));// see whether or not has correct 
     			age = rs.getInt("age");
-    			String add = rs.getString("address"); 
+    			String add = rs.getString("address");
     			People p  = new People(id, name, age, add); // pass into traditional constructor 
     			vt.add(p);
     		}
@@ -45,8 +45,7 @@ public class People {
 
 	public People(int id, String name, int age, String address) {
         this.id = id;
-        this.name = new String(name);
-        System.out.println("thisname "+this.name);
+        this.name = name;
         this.age = age;
         this.address = address;
     }
@@ -88,12 +87,12 @@ public class People {
     @Override
     public String toString() {
         return "People{" +
-                "id=" + this.id +
-                ", name='" + this.name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", age=" + age +
                 ", address='" + address + '\'' +
-                '}';// you should use String s2=new String(s1); id will change ,
-    }// you can't use id to copy string in the method, name will change out of the method
+                '}';
+    }
     
     public static void main(String[] args) {
 		 	People p = new People();

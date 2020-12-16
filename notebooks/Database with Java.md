@@ -88,7 +88,7 @@ DELETE FROM XXX 删除
 UPDATE xxx
 SET XXX  修改数据
 INSERT INTO xxx
-VALUES ('XXX','AAA',)
+VALUES ('XXX','AAA',)// 注意不是双引号""
 
 ```
 
@@ -123,3 +123,8 @@ ODBC 为C语言 访问数据库 提供了接口.
 java 操作数据库可以用Derby,清华源下载. 
 
 https://www.cnblogs.com/azhqiang/p/3876214.html
+
+
+
+
+
