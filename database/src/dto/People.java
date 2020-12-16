@@ -12,16 +12,18 @@ public class People {
 	String password = "111111";
     Vector<People> vt = new Vector<People>(); 
     Statement s = null;
+    ResultSet rs  = null;
+    private PreparedStatement preSt;
     // from database Derby_data\\\\dedb  ,table people, create class people
     public People() {
     	Init();
     	try {
-    		ResultSet rs = s.executeQuery("select * from people");
+    		rs= s.executeQuery("select * from people");
     		while(rs.next() ) {
-    			System.out.println(rs.getInt("age"));
+    		//	System.out.println("age is "+rs.getInt("age"));
     			id = rs.getInt("id"); 
     			String name = rs.getString("name"); 
-    			System.out.println(rs.getString("name"));// see whether or not has correct 
+    		//	System.out.println(rs.getString("name"));// see whether or not has correct 
     			age = rs.getInt("age");
     			String add = rs.getString("address"); 
     			People p  = new People(id, name, age, add); // pass into traditional constructor 
@@ -46,7 +48,7 @@ public class People {
 	public People(int id, String name, int age, String address) {
         this.id = id;
         this.name = new String(name);
-        System.out.println("thisname "+this.name);
+     //   System.out.println("thisname "+this.name);
         this.age = age;
         this.address = address;
     }
@@ -67,6 +69,16 @@ public class People {
     }
 
     public int getAge() {
+    	String url = "jdbc:derby:Derby_data\\\\dedb";
+   		String sql = "select age from people";
+   		try {
+   			 Connection conn = DriverManager.getConnection(url,username,password);
+   			 s = conn.createStatement();
+   			 rs = s.executeQuery(sql);
+   			 System.out.print(" add success!"+rs);
+   		} catch (SQLException e) { 
+   		e.printStackTrace();
+   		}
         return age;
     }
 
@@ -82,8 +94,28 @@ public class People {
         this.address = address;
     }
     
-    public void add(String add ) {
-		String sql = "insert address from people";
+    public void add(int id,String name,int age,String add ) {
+        String url = "jdbc:derby:Derby_data\\\\dedb";
+		String sql = "insert into people values(?,'?' ,?,'?')";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		try {
+			Connection conn = DriverManager.getConnection(url,username,password);
+			 preSt = conn.prepareStatement(sql);
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
+		try {
+			preSt.setString(1, String.valueOf(id));
+			System.out.print(preSt.toString());
+			preSt.setString(2, name);
+			
+			preSt.setString(3, String.valueOf(age));
+			System.out.print(preSt.toString());
+			preSt.setString(4, add);
+			System.out.print(preSt.toString());
+			 System.out.print(" add success!"+preSt.executeUpdate());
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
 	}
     @Override
     public String toString() {
@@ -97,7 +129,9 @@ public class People {
     
     public static void main(String[] args) {
 		 	People p = new People();
-		    System.out.println(p);
+		    System.out.println(p.vt);
+		    p.add(3,"zhang",13,"hangzhou");//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		   // p.add("string");
 		    System.out.println(" finished");
 		}
 }
