@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="java.util.AbstractList"/>
+    <fullyQualifiedTypeName name="java.lang.reflect.Array"/>
+    <fullyQualifiedTypeName name="java.util.Scanner"/>
+    <fullyQualifiedTypeName name="dshomewrok.Zigzagtree"/>
+    <fullyQualifiedTypeName name="dshomewrok.Zigzagtree.TreeNode"/>
+    <fullyQualifiedTypeName name="dshomewrok.JudgeRedBlackTree.TreeNode"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+</qualifiedTypeNameHistroy>

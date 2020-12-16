@@ -1,0 +1,100 @@
+package dto;
+
+import java.sql.*;
+import java.util.Vector;
+
+public class People {
+    private int id;
+    private String name;
+    private int age;
+    private String address;
+	String username = "db_user1";
+	String password = "111111";
+    Vector<People> vt = new Vector<People>(); 
+    Statement s = null;
+    // from database Derby_data\\\\dedb  ,table people, create class people
+    public People() {
+    	Init();
+    	try {
+    		ResultSet rs = s.executeQuery("select * from people");
+    		while(rs.next() ) {
+    			id = rs.getInt(id); 
+    			String name = rs.getString("name");
+    			age = rs.getInt("age");
+    			String add = rs.getString("address");
+    			People p  = new People(id, name, age, add); // pass into traditional constructor 
+    			vt.add(p);
+    		}
+    	}catch (Exception e) {
+			e.printStackTrace();// TODO: handle exception
+		}
+    }
+
+    private void Init() {
+		// TODO Auto-generated method stub
+    	String url = "jdbc:derby:Derby_data\\\\dedb";
+    	try {
+			 Connection conn = DriverManager.getConnection(url,username,password);
+			 s = conn.createStatement();
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
+	}
+
+	public People(int id, String name, int age, String address) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.address = address;
+    }
+
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
+    public void add(String add ) {
+		String sql = "insert address from people";
+	}
+    @Override
+    public String toString() {
+        return "People{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", address='" + address + '\'' +
+                '}';
+    }
+    
+    public static void main(String[] args) {
+		 	People p = new People();
+		    System.out.println(p);
+		    System.out.println(" finished");
+		}
+}
