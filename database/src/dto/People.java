@@ -96,7 +96,8 @@ public class People {
     
     public void add(int id,String name,int age,String add ) {
         String url = "jdbc:derby:Derby_data\\\\dedb";
-		String sql = "insert into people values(?,'?' ,?,'?')";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		String sql = "insert into people values(?, ?  ,?, ?)";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
 			 preSt = conn.prepareStatement(sql);
@@ -105,7 +106,7 @@ public class People {
 		}
 		try {
 			preSt.setString(1, String.valueOf(id));
-			System.out.print(preSt.toString());
+			System.out.print(String.valueOf(id)+name);
 			preSt.setString(2, name);
 			
 			preSt.setString(3, String.valueOf(age));
@@ -130,7 +131,7 @@ public class People {
     public static void main(String[] args) {
 		 	People p = new People();
 		    System.out.println(p.vt);
-		    p.add(3,"zhang",13,"hangzhou");//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		    //p.add(3,"zhang",13,"hangzhou");//insert into people values(2,'wangqiang' ,12,'Beijingwang');
 		   // p.add("string");
 		    System.out.println(" finished");
 		}
