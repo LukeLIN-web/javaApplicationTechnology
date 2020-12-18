@@ -1,5 +1,5 @@
 package dto;
-
+// BuildClassManually  12.16 
 import java.sql.*;
 import java.util.Vector;
 
@@ -108,7 +108,6 @@ public class People {
 			preSt.setString(1, String.valueOf(id));
 			System.out.print(String.valueOf(id)+name);
 			preSt.setString(2, name);
-			
 			preSt.setString(3, String.valueOf(age));
 			System.out.print(preSt.toString());
 			preSt.setString(4, add);
@@ -130,8 +129,8 @@ public class People {
     
     public static void main(String[] args) {
 		 	People p = new People();
+		   // p.add(5,"wangwu",15,"hangzhouyuquan");//insert into people values(2,'wangqiang' ,12,'Beijingwang');
 		    System.out.println(p.vt);
-		    //p.add(3,"zhang",13,"hangzhou");//insert into people values(2,'wangqiang' ,12,'Beijingwang');
 		   // p.add("string");
 		    System.out.println(" finished");
 		}

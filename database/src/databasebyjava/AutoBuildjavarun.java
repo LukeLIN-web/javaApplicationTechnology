@@ -1,0 +1,115 @@
+package databasebyjava;
+
+	import javax.tools.JavaCompiler;
+	import javax.tools.ToolProvider;
+	import java.io.File;
+	import java.io.FileWriter;
+	import java.io.IOException;
+	import java.io.PrintWriter;
+	import java.lang.reflect.Method;
+	import java.net.URI;
+	import java.net.URISyntaxException;
+	import java.nio.file.Files;
+	import java.nio.file.Path;
+	import java.nio.file.Paths;
+import java.sql.*;
+
+	/*java 动态编译。将文本写到文件，用Java的类加载动态运行。
+	 * 1.使用jdk自带rt.jar中的javax.tools包提供的编译器（也可以用runtime运行cmd）进行编译java源文件。
+	2.重写类加载器达到加载指定文件夹下的类。 */
+public class  AutoBuildjavarun {
+	    public static void main(String[] args) throws SQLException {
+	        int i = 10;
+	        String code = getTable("people");
+	        try {
+	        	String classname = compile(code);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    private static String getTable(String table) {
+	    	try{
+	    	String url = "jdbc:derby:Derby_data\\\\dedb";
+	    	String username = "db_user1";
+		    String password = "111111";
+	    	Connection conn = DriverManager.getConnection(url,username,password);
+		    Statement s = conn.createStatement();
+		    ResultSet rs  = s.executeQuery(" select * from"+ table) ;
+		    ResultSetMetaData mta = rs.getMetaData();
+		    int col = mta.getColumnCount();
+		    
+	    	String code = "import java.sql.*;";//  code+="\r\n"; 
+	        code += "import java.util.Vector;";code+="\r\n"; 
+	        code += "public class";code+="\r\n"; //code+="\r\n";  for newline
+	        code += table;
+	        code += "{";
+	        code += " Statement s = null;";
+		        for(int i =1 ; i<= col; i ++) {
+		        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+		        		code += "int\t";
+		        		code += mta.getColumnName(i);  code += ";";
+		        	}
+		        	// , Varchar: 12 
+		        	//12.18 to be continue
+		    	}
+		         
+	    	}
+	    	catch (Exception e) {
+	    		 e.printStackTrace();// TODO: handle exception
+			}
+	        return code;
+	    }
+	    
+	    //先编译,返回文件
+	     synchronized static String compile(String code) throws Exception {
+	    	String filename = code.substring(1, 4)+ "_sql";
+	    	File file = new File(Constants.BASEDIR+"/"+filename+".java"); //选择文件夹
+	    	if(file.exists()){
+	             System.out.println("java文件已经存在！");
+	         }
+	       // 获得类名
+	        String classname = filename; 
+	        // 将代码输出到文件
+	        PrintWriter out = new PrintWriter(new FileWriter(file),true); //FileWriter true是追加
+	        out.println(getClassCode(code, classname));
+	        out.close();
+	        
+	        // 编译生成的java文件
+	        System.out.println("usr dir = "+System.getProperty("user.dir"));
+	        //动态编译
+	        JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+	        int status = javac.run(null, null, null, "-d", Constants.BASEDIR,Constants.BASEDIR+"/"+filename+".java");
+	        if (status != 0) {
+	            throw new Exception("语法错误！");
+	        }
+	        return classname;
+	    }
+
+	    //将一块代码封装到 method函数中
+	    private static String getClassCode(String code, String className) {
+	        StringBuffer text = new StringBuffer();
+	        text.append("public class " + className + "{\n");//我后缀要加上jzup,有public会报错误: 类 是公共的, 应在名为 的文件中声明,我删除了public.但是会报错cannot access a member of class yst with modifiers "public static"
+	        text.append(" public static void method(){\n");
+	        text.append(" " + code + "\n");
+	        text.append(" }\n");
+	        text.append("}");
+	        return text.toString();
+	    }
+	    private static String getBaseFileName(File file) {
+	        String fileName = file.getName();
+	        if(fileName.contains(".")){
+	            return fileName.split("\\.")[0];
+	        }else {
+	            return fileName;
+	        }
+
+	    }
+}
+
+	//常量
+interface Constants{
+	    String BASEDIR="D:\\eclipse\\database";
+	    String SUFFIX=".class";
+}
+

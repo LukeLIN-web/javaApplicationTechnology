@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Wed Dec 16 23:41:45 CST 2020:
+Fri Dec 18 22:45:42 CST 2020:
 正在使用类加载程序 jdk.internal.loader.ClassLoaders$AppClassLoader@15db9742 引导数据库
-目录 D:\eclipse\database\Derby_data\dedb 中的 Derby 版本 The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585) 实例 a816c00e-0176-6c36-e599-00000f70b330
+目录 D:\eclipse\database\Derby_data\dedb 中的 Derby 版本 The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585) 实例 a816c00e-0176-7650-4b23-00000f70ef08
 已从 file:/D:/eclipse/database/db-derby-10.15.2.0-bin/lib/derby.jar 加载
 java.vendor=Oracle Corporation
 java.runtime.version=14.0.2+12-46
