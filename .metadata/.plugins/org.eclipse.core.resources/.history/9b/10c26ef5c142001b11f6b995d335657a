@@ -1,0 +1,50 @@
+package databasebyjava;
+import java.sql.*;
+import java.util.Vector;
+
+public class people {  
+	Statement s = null;
+	String username = "db_user1";
+	String password = "111111";
+	String url = "jdbc:derby:Derby_data\\\\dedb";
+	int	ID;
+	String	NAME;
+	int	AGE;
+	String	ADDRESS;
+	people(){}
+	people(int id){
+		Init();
+		try{
+		ResultSet rs  = s.executeQuery("select * from people");  
+		while( rs.next() ) { 
+	ID= rs.getInt(1);
+	NAME = rs.getString(2);
+	AGE= rs.getInt(3);
+	ADDRESS = rs.getString(4);
+		}
+	}catch (Exception e) {
+		e.printStackTrace();}
+	}
+	private void Init() {
+	try {
+	Connection conn = DriverManager.getConnection(url,username,password);
+	s = conn.createStatement();
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
+	}
+     public String toString() {
+return  ID+NAME+AGE+ADDRESS ;	}
+public void add(int id){
+	String sql = "insert into people (id) values( id )  ";  //insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		System.out.print(sql);
+		try{
+	Connection conn = DriverManager.getConnection(url,username,password);
+			 Statement s  = conn.prepareStatement(sql);
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}	
+}
+
+}
+

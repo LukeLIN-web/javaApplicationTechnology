@@ -2,7 +2,7 @@ package databasebyjava;
 
 	import javax.tools.JavaCompiler;
 	import javax.tools.ToolProvider;
-	import java.io.File;
+import java.io.File;
 	import java.io.FileWriter;
 	import java.io.IOException;
 	import java.io.PrintWriter;
@@ -13,7 +13,12 @@ package databasebyjava;
 	import java.nio.file.Path;
 	import java.nio.file.Paths;
 	import java.sql.*;
-	//automatically generated class
+	
+	/*
+	 * automatically generated class 12.17-12.20, 
+	 * manual: you just change the var table, it will  generate the .class and .java from the database . 
+	 * you can use 
+	 */
 	/*java 动态编译。将文本写到文件，用Java的类加载动态运行。
 	 * 1.使用jdk自带rt.jar中的javax.tools包提供的编译器（也可以用runtime运行cmd）进行编译java源文件。
 	2.重写类加载器达到加载指定文件夹下的类。 */
@@ -29,7 +34,7 @@ public class  AutoBuildjavarun {
 	    }
 	    
 	    private static String getTable(String table) {
-	    	String code = "import java.sql.*;\n";
+	    	String code = "package databasebyjava;\n import java.sql.*;\n";
 	    	try{
 		    	String url = "jdbc:derby:Derby_data\\\\dedb";
 		    	String username = "db_user1";
@@ -46,6 +51,7 @@ public class  AutoBuildjavarun {
 		        code += " {  \n";
 		        code = code +  "	Statement s = null;\n	String username = \"db_user1\";\n" + 
 		        		"	String password = \"111111\";\n";
+		        code +=	"	String url = \"jdbc:derby:Derby_data\\\\\\\\dedb\";\n";
 		        //from metadata extract variable name.  such as int id;
 			    for(int i =1 ; i<= col; i ++) {
 			        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
@@ -58,7 +64,9 @@ public class  AutoBuildjavarun {
 			        	}// define VAR   Varchar: 12 
 			    }
 			 	code = code +"	"+table +"(){}\n"; //constructor 
-	        	// parameter  constructor 
+			 	
+			 	
+	        	//******************************** parameter  constructor ********************************
 	        	code = code + "	"+ table+"(int id){\n";
 	        	code += "		Init();\n";
 	        	code += "		try{\n";
@@ -79,9 +87,9 @@ public class  AutoBuildjavarun {
 	        	code += "		e.printStackTrace();}\n" ;
 	        	code +=	"	}\n";
 	        	
-	        	// Init method of class
+	        	// ********************************Init method of class********************************
 	        	code +=	"	private void Init() {\n";
-	        	code +=	"	String url = \"jdbc:derby:Derby_data\\\\\\\\dedb\";\n";
+	        	
 	        	code +=	"	try {\n";
 	        	code +=	"	Connection conn = DriverManager.getConnection(url,username,password);\n";
 	        	code += "	s = conn.createStatement();\n";
@@ -90,15 +98,95 @@ public class  AutoBuildjavarun {
 	        			"		}\n" + 
 	        			"	}\n" ;// Init() method finished
 	        
-	        	// toString method of class
+	        	// ********************************toString method of class********************************
 	        	code += "     public String toString() {\n";
 	        	code += "return  ";  
 	        	for(int i = 1 ; i< col; i ++) 
 		        	code = code + mta.getColumnName(i) + "+";
 	        	code = code + mta.getColumnName(col) +" ;";
-	        	code = code + "\t}";
+	        	code = code + "\t}\n";
 	        	
-	        	code +=	"\n}\n";// all class finished
+	        	
+	        	//******************************** ADD  method  of class ********************************
+	        	code = code + "public void add(";
+	    	    for(int i =1 ; i<= col; i ++) {
+		        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+		        		code += "	int\t";
+		        		code += mta.getColumnName(i);  
+		        	}
+		        	if(mta.getColumnType(i) == 12) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+		        		code += "	String\t";
+		        		code += mta.getColumnName(i);  
+		        	}// define VAR   Varchar: 12 
+		        	if(i < col)code += ",";  
+		    }
+	    	    code += ")\n{";
+	        	code += "	String sql = \"insert into "+ table +" (" ;
+	        	 for(int i =1 ; i<= col; i ++) {
+			        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+			        	
+			        		code += "\\\"" + mta.getColumnName(i);  
+			        	}
+			        	if(mta.getColumnType(i) == 12) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+			        		
+			        		code += "\\\"" +  mta.getColumnName(i);  
+			        	}// define VAR   Varchar: 12 
+			        	if(i < col)code += "\\\",";  
+			    }
+	        			code +="\\\"  ) values (\"+";
+	        			//the format is String sql = "insert into people (\"ID\" ) values (" + String.valueOf(id) + ") "; 
+	        		for(int i =1 ; i<= col; i ++) {
+	    		        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+	    		        		code += "String.valueOf(";
+	    		        		code += mta.getColumnName(i) +")"; 
+	    		        	}
+	    		        	if(mta.getColumnType(i) == 12) { // string :12 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+	    		        		
+	    		        		code += mta.getColumnName(i);
+	    		        	}// define VAR   Varchar: 12 
+	    		        	code += "+";  
+	    		        	if(i < col)code += "\",\"+";  
+	    		    }
+	        		code +="  \") \" ; ";
+	        		/*
+	        		 *  method usage :  usr.add("'uiwe'","\'ljy\'",21,"'hagnzhou'");  or 	p1.add(19,"'weiu'",20,"'shier'") 
+	        		 *  don't ignore the '' when you input string.
+	        		 */
+	        		
+	        	
+	        	code +=  
+	        			"	\n	System.out.print(sql);\n" ;
+	        	code += "		try{\n";
+	        	code = code+ "		Connection conn = DriverManager.getConnection(url,username,password);\n" + 
+	        			"			 Statement s  = conn.createStatement();\n" + 
+	        			"	s.executeUpdate(sql);	} catch (SQLException e) { \n" + 
+	        			"		e.printStackTrace();";
+	        	code += "\n" + 
+	        			"		}";
+	        	code +=	"	\n}\n";
+	        	
+	        	//******************************** delete method  of class********************************
+	        	code = code + "public void delete(int id){\n";
+	        	code += "String sql = \"DELETE FROM people WHERE id = \" +  String.valueOf(id); \n";
+	        	
+	        	code +=  "System.out.print(sql);" + 
+	        			"\n" + 
+	        			"		try {" ;
+	        	code += "\n" + 
+	        			"		Connection conn = DriverManager.getConnection(url,username,password);\n" + 
+	        			"		Statement s  = conn.createStatement();\n" + 
+	        			"	int line = s.executeUpdate(sql);\nif(line > 0)\n" + 
+	        			"			 System.out.print(\" delete  success! change \"+line+\" lines\");\n" + 
+	        			"			else \n" + 
+	        			"				System.out.print(\"\\n don't delete anything! change \"+line+\" lines\");\n" + 
+	        			"			} catch (SQLException e) { \n" + 
+	        			"		e.printStackTrace();\n" + 
+	        			"		}\n" ; 
+	        	code +=	"	\n}\n";
+	        	
+	        	
+	        	
+	        	code +=	"\n}\n";//  class all finished
 	        	
 	        	
 	    	}
@@ -135,7 +223,7 @@ public class  AutoBuildjavarun {
 
 	//常量
 interface Constants{
-	    String BASEDIR="D:\\eclipse\\database\\AutoBuildClassRoot";
+	    String BASEDIR=".\\AutoBuildClassRoot";
 	    String SUFFIX=".class";
 }
 

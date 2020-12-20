@@ -1,6 +1,6 @@
 package databasebyjava;
 
-//it may use for test automatically generated class. 12.19actually you can ignore it because setxx is unfinished.
+//it may use for test automatically generated class. 12.20
 public class BuildClassManually {
 	
 	public static void main(String[] args) {
@@ -19,7 +19,9 @@ public class BuildClassManually {
 //		    t_user usr =  new t_user(1);
 //		    System.out.println(usr.ADDRESS+"name = "+usr.NAME+usr.UUID+usr.AGE);
 		people p1 = new people(1);
+		p1.add(19,"'weiu'",20,"'shier'");//p1.add(19,"weiu",20,"shier"); will have error : “WEIU” not in any table FROM list
 		System.out.println(p1);
+		t_user usr = new t_user(1);
+		usr.add("'uiwe'","\'ljy\'",21,"'hagnzhou'");// notice : we need add '' to input string.
 		}
-	
 }

@@ -126,5 +126,6 @@ https://www.cnblogs.com/azhqiang/p/3876214.html
 
 
 
+关于插入语句的用法: 
 
-
+http://c.biancheng.net/view/2574.html
