@@ -1,5 +1,6 @@
 package databasebyjava;
 import java.sql.*;
+// connect with the database directly 
 public class DerbyFirstTry {
 	private static String driver = "org.apache.derby.jdbc.EmbeddedDriver";// register driver class
 	private static String protocol = "jdbc:derby:";
@@ -38,6 +39,8 @@ public class DerbyFirstTry {
 	               System.out.println(rs.getString(2));
 	               System.out.println(rs.getInt(3));
 	               System.out.println(rs.getString(4));
+	               System.out.print("zheshi  n"); // \n can be a newline
+	               System.out.print("zheshi  r \r\n");
 			}
 		} catch (SQLException e1) {
 		e1.printStackTrace();

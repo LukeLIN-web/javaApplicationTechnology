@@ -12,104 +12,130 @@ package databasebyjava;
 	import java.nio.file.Files;
 	import java.nio.file.Path;
 	import java.nio.file.Paths;
-import java.sql.*;
-
+	import java.sql.*;
+	//automatically generated class
 	/*java 动态编译。将文本写到文件，用Java的类加载动态运行。
 	 * 1.使用jdk自带rt.jar中的javax.tools包提供的编译器（也可以用runtime运行cmd）进行编译java源文件。
 	2.重写类加载器达到加载指定文件夹下的类。 */
 public class  AutoBuildjavarun {
-	    public static void main(String[] args) throws SQLException {
-	        int i = 10;
-	        String code = getTable("people");
+	    public static void main(String[] args)  {
+	    	String table = "people" ; // change the table to change what table you will create 
+	        String code = getTable(table);
 	        try {
-	        	String classname = compile(code);
+	        	compile(code,table);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
 	    }
 	    
 	    private static String getTable(String table) {
+	    	String code = "import java.sql.*;\n";
 	    	try{
-	    	String url = "jdbc:derby:Derby_data\\\\dedb";
-	    	String username = "db_user1";
-		    String password = "111111";
-	    	Connection conn = DriverManager.getConnection(url,username,password);
-		    Statement s = conn.createStatement();
-		    ResultSet rs  = s.executeQuery(" select * from"+ table) ;
-		    ResultSetMetaData mta = rs.getMetaData();
-		    int col = mta.getColumnCount();
-		    
-	    	String code = "import java.sql.*;";//  code+="\r\n"; 
-	        code += "import java.util.Vector;";code+="\r\n"; 
-	        code += "public class";code+="\r\n"; //code+="\r\n";  for newline
-	        code += table;
-	        code += "{";
-	        code += " Statement s = null;";
-		        for(int i =1 ; i<= col; i ++) {
-		        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
-		        		code += "int\t";
-		        		code += mta.getColumnName(i);  code += ";";
-		        	}
-		        	// , Varchar: 12 
-		        	//12.18 to be continue
-		    	}
-		         
+		    	String url = "jdbc:derby:Derby_data\\\\dedb";
+		    	String username = "db_user1";
+			    String password = "111111";
+		    	Connection conn = DriverManager.getConnection(url,username,password);
+			    Statement s = conn.createStatement();
+			    ResultSet rs  = s.executeQuery(" select * from "+ table) ;
+			    ResultSetMetaData mta = rs.getMetaData();
+			    
+			    int col = mta.getColumnCount();
+		        code += "import java.util.Vector;";code+="\r\n"; // for newline
+		        code += "public class ";  
+		        code += table;
+		        code += " {  \n";
+		        code = code +  "	Statement s = null;\n	String username = \"db_user1\";\n" + 
+		        		"	String password = \"111111\";\n";
+		        //from metadata extract variable name.  such as int id;
+			    for(int i =1 ; i<= col; i ++) {
+			        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+			        		code += "	int\t";
+			        		code += mta.getColumnName(i);  code += ";\n";
+			        	}
+			        	if(mta.getColumnType(i) == 12) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+			        		code += "	String\t";
+			        		code += mta.getColumnName(i);  code += ";\n";  
+			        	}// define VAR   Varchar: 12 
+			    }
+			 	code = code +"	"+table +"(){}\n"; //constructor 
+	        	// parameter  constructor 
+	        	code = code + "	"+ table+"(int id){\n";
+	        	code += "		Init();\n";
+	        	code += "		try{\n";
+	        	code = code+ "		ResultSet rs  = s.executeQuery(\"select * from " +table +"\");  \r\n";
+	        	code += "		while( rs.next() ) { \r\n";
+	        	// such as  id = rs.getInt("id"); 
+	        	for(int i =1 ; i<= col; i ++) {
+	        		
+			        	if(mta.getColumnType(i) == 4) { // Integer: 4 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+			        		code = code +"	"+ mta.getColumnName(i) + "= rs.getInt(" + i + ");\n";
+			        	}
+			        	if(mta.getColumnType(i) == 12) { // Integer: 12 you can find inhttp://www.openoffice.org/api/docs/common/ref/com/sun/star/sdbc/DataType.html
+			        		code = code +"	"+ mta.getColumnName(i) + " = rs.getString(" + i + ");\n";
+			        	}// define VAR   Varchar: 12 
+			    }
+	        	code += "		}\n";
+	        	code += "	}catch (Exception e) {\r\n";
+	        	code += "		e.printStackTrace();}\n" ;
+	        	code +=	"	}\n";
+	        	
+	        	// Init method of class
+	        	code +=	"	private void Init() {\n";
+	        	code +=	"	String url = \"jdbc:derby:Derby_data\\\\\\\\dedb\";\n";
+	        	code +=	"	try {\n";
+	        	code +=	"	Connection conn = DriverManager.getConnection(url,username,password);\n";
+	        	code += "	s = conn.createStatement();\n";
+	        	code = code + "		} catch (SQLException e) { \n" + 
+	        			"		e.printStackTrace();\n" + 
+	        			"		}\n" + 
+	        			"	}\n" ;// Init() method finished
+	        
+	        	// toString method of class
+	        	code += "     public String toString() {\n";
+	        	code += "return  ";  
+	        	for(int i = 1 ; i< col; i ++) 
+		        	code = code + mta.getColumnName(i) + "+";
+	        	code = code + mta.getColumnName(col) +" ;";
+	        	code = code + "\t}";
+	        	
+	        	code +=	"\n}\n";// all class finished
+	        	
+	        	
 	    	}
 	    	catch (Exception e) {
-	    		 e.printStackTrace();// TODO: handle exception
+	    		 e.printStackTrace();
 			}
 	        return code;
 	    }
 	    
 	    //先编译,返回文件
-	     synchronized static String compile(String code) throws Exception {
-	    	String filename = code.substring(1, 4)+ "_sql";
-	    	File file = new File(Constants.BASEDIR+"/"+filename+".java"); //选择文件夹
+	     synchronized static void compile(String code,String table) throws Exception {
+	    	File file = new File(Constants.BASEDIR+"/"+table+".java"); //选择文件夹
 	    	if(file.exists()){
 	             System.out.println("java文件已经存在！");
 	         }
 	       // 获得类名
-	        String classname = filename; 
+	        String classname = table; 
 	        // 将代码输出到文件
 	        PrintWriter out = new PrintWriter(new FileWriter(file),true); //FileWriter true是追加
-	        out.println(getClassCode(code, classname));
+	        out.println(code);
 	        out.close();
 	        
 	        // 编译生成的java文件
 	        System.out.println("usr dir = "+System.getProperty("user.dir"));
 	        //动态编译
 	        JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
-	        int status = javac.run(null, null, null, "-d", Constants.BASEDIR,Constants.BASEDIR+"/"+filename+".java");
+	        int status = javac.run(null, null, null, "-d", Constants.BASEDIR,Constants.BASEDIR+"/"+table+".java");
 	        if (status != 0) {
-	            throw new Exception("语法错误！");
+	            throw new Exception("systax error!");
 	        }
-	        return classname;
-	    }
-
-	    //将一块代码封装到 method函数中
-	    private static String getClassCode(String code, String className) {
-	        StringBuffer text = new StringBuffer();
-	        text.append("public class " + className + "{\n");//我后缀要加上jzup,有public会报错误: 类 是公共的, 应在名为 的文件中声明,我删除了public.但是会报错cannot access a member of class yst with modifiers "public static"
-	        text.append(" public static void method(){\n");
-	        text.append(" " + code + "\n");
-	        text.append(" }\n");
-	        text.append("}");
-	        return text.toString();
-	    }
-	    private static String getBaseFileName(File file) {
-	        String fileName = file.getName();
-	        if(fileName.contains(".")){
-	            return fileName.split("\\.")[0];
-	        }else {
-	            return fileName;
-	        }
-
+	        System.out.println("compile success! The classname is "+classname);
 	    }
 }
 
 	//常量
 interface Constants{
-	    String BASEDIR="D:\\eclipse\\database";
+	    String BASEDIR="D:\\eclipse\\database\\AutoBuildClassRoot";
 	    String SUFFIX=".class";
 }
 

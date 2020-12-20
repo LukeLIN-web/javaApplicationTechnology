@@ -4,6 +4,8 @@ import java.sql.*;
 import java.util.Vector;
 
 public class People {
+	Statement s = null;
+	String url = "jdbc:derby:Derby_data\\\\dedb";
     private int id;
     private String name;
     private int age;
@@ -11,7 +13,6 @@ public class People {
 	String username = "db_user1";
 	String password = "111111";
     Vector<People> vt = new Vector<People>(); 
-    Statement s = null;
     ResultSet rs  = null;
     private PreparedStatement preSt;
     // from database Derby_data\\\\dedb  ,table people, create class people
@@ -36,7 +37,7 @@ public class People {
 
     private void Init() {
 		// TODO Auto-generated method stub
-    	String url = "jdbc:derby:Derby_data\\\\dedb";
+    	
     	try {
 			 Connection conn = DriverManager.getConnection(url,username,password);
 			 s = conn.createStatement();
@@ -53,49 +54,92 @@ public class People {
         this.address = address;
     }
 
-    public int getId() {
-        return id;
-    }
+
     public void setId(int id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
+    public void delete(String name) {
+		String sql = "DELETE FROM people WHERE name = ? ";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		System.out.print(sql);
+		try {
+			Connection conn = DriverManager.getConnection(url,username,password);
+			 preSt = conn.prepareStatement(sql);
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
+		try {
+			preSt.setString(1, name);
+			System.out.print("\n  name  = " +name);
+			int line = preSt.executeUpdate();
+			if(line > 0)
+			 System.out.print(" delete  success! change "+line+" lines");
+			else 
+				System.out.print("\n don't delete anything! change "+line+" lines");
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
     }
 
     public int getAge() {
-    	String url = "jdbc:derby:Derby_data\\\\dedb";
    		String sql = "select age from people";
    		try {
    			 Connection conn = DriverManager.getConnection(url,username,password);
    			 s = conn.createStatement();
    			 rs = s.executeQuery(sql);
-   			 System.out.print(" add success!"+rs);
+   			 System.out.print(" query success!"+rs);
    		} catch (SQLException e) { 
    		e.printStackTrace();
    		}
         return age;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setAge(int age,String name) {
+		String sql = "update people set age = ? where name = ?";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		System.out.print(sql);
+		try {
+			Connection conn = DriverManager.getConnection(url,username,password);
+			 preSt = conn.prepareStatement(sql);
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
+		try {
+			preSt.setString(1, String.valueOf(age));
+			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
+			preSt.setString(2, name);
+			System.out.print("preset  = "+preSt.toString());
+			 System.out.print(" set age  success! change "+preSt.executeUpdate()+" lines");
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
     }
 
-    public String getAddress() {
-        return address;
-    }
+  
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAddress(String address,String name) {
+		String sql = "update people set address = ? where name = ?";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		System.out.print(sql);
+		try {
+			Connection conn = DriverManager.getConnection(url,username,password);
+			 preSt = conn.prepareStatement(sql);
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
+		try {
+			preSt.setString(1, address);
+			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
+			preSt.setString(2, name);
+			System.out.print("preset  = "+preSt.toString());
+			 System.out.print(" add success! change "+preSt.executeUpdate()+" lines");
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
     }
-    
+    /* input the parameter.
+     *   
+     */
     public void add(int id,String name,int age,String add ) {
-        String url = "jdbc:derby:Derby_data\\\\dedb";
 		String sql = "insert into people values(?, ?  ,?, ?)";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
@@ -106,13 +150,13 @@ public class People {
 		}
 		try {
 			preSt.setString(1, String.valueOf(id));
-			System.out.print(String.valueOf(id)+name);
+			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
 			preSt.setString(2, name);
 			preSt.setString(3, String.valueOf(age));
-			System.out.print(preSt.toString());
+			System.out.print("preset  = "+preSt.toString());
 			preSt.setString(4, add);
-			System.out.print(preSt.toString());
-			 System.out.print(" add success!"+preSt.executeUpdate());
+			System.out.print("preset  = "+preSt.toString());
+			 System.out.print(" change address success!"+preSt.executeUpdate());
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
@@ -124,14 +168,17 @@ public class People {
                 ", name='" + this.name + '\'' +
                 ", age=" + age +
                 ", address='" + address + '\'' +
-                '}';// you should use String s2=new String(s1); id will change ,
+                "}\n";// you should use String s2=new String(s1); id will change ,
     }// you can't use id to copy string in the method, name will change out of the method
     
     public static void main(String[] args) {
 		 	People p = new People();
 		   // p.add(5,"wangwu",15,"hangzhouyuquan");//insert into people values(2,'wangqiang' ,12,'Beijingwang');
-		    System.out.println(p.vt);
-		   // p.add("string");
+		 	//p.setAddress("hangzhouzjg","we");
+		 	System.out.println(p.vt); // show all line in the table
+		    //p.setAge(20, "we");
+		 	p.delete("we");
+		 	
 		    System.out.println(" finished");
 		}
 }
