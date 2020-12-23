@@ -24,7 +24,13 @@ System.out.println("服务器启动监听在"+port+"端口...");
 }
 //单客户版本，每次只能与一个用户建立通信连接
 public void Service(){
+	try {
+		TCPServer();
+	} catch (Exception e) {
+		// TODO: handle exception
+	}
 while (true){
+	
 Socket socket=null;
 try {
 //此处程序阻塞，监听并等待用户发起连接，有连接请求就生成一个套接字
@@ -53,6 +59,7 @@ e.printStackTrace();
 try {
 if (socket!=null)
 socket.close();//关闭socket连接以及相关的输入输出流
+System.out.println("the socket has closed");
 }catch (IOException e){
 e.printStackTrace();
 }

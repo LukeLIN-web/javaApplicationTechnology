@@ -27,6 +27,7 @@ public class HttpServer {
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(SERVER_PORT);
+            System.out.println("服务器启动监听在"+SERVER_PORT+"端口...");
         }
         catch (Exception e) {
             e.printStackTrace();
