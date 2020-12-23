@@ -104,4 +104,19 @@
 		<item key="INCLUDE_MASK" value="11"/>
 		<item key="HISTORY_SIZE" value="0"/>
 	</section>
+	<section name="org.eclipse.ltk.ui.refactoring.settings">
+		<item key="renameSubpackages" value="false"/>
+		<item key="updateTextualMatches" value="false"/>
+		<item key="updateQualifiedNames" value="false"/>
+		<item key="patterns" value="*"/>
+		<item key="updateSimilarElements" value="false"/>
+		<item key="updateSimilarElementsMatchStrategy" value="1"/>
+	</section>
+	<section name="ClasspathContainerSelectionPage">
+		<item key="index" value="5"/>
+	</section>
+	<section name="BreadcrumbItemDropDown">
+	</section>
+	<section name="RenameInformationPopup">
+	</section>
 </section>

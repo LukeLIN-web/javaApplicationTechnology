@@ -52,6 +52,7 @@ System.out.println("客户端离开。");
 break;
 }
 pw.println("来自服务器消息："+msg);
+pw.println("来自服务器,重复消息："+msg);
 }
 }catch (IOException e){
 e.printStackTrace();

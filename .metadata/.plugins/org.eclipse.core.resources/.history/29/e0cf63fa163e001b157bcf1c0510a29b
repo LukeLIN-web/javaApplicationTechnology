@@ -1,5 +1,0 @@
-package databasebyjava;
-import java.sql.*;
-public class DerbyFirstTry {
-
-}

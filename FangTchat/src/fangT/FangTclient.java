@@ -4,6 +4,9 @@ package fangT;
 * Copyright (c) 2020-10-25
 */
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -91,7 +94,11 @@ while ((receiveMsg=tcpClient.receive())!=null){
 //若将receiveMsg定义为类成员变量，则无需临时变量
 String msgTemp = receiveMsg;
 Platform.runLater(()->{
-taDisplay.appendText(msgTemp+"\n");
+	LocalDateTime now = LocalDateTime.now();
+	DateTimeFormatter dtf= DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+	taDisplay.appendText(dtf.format(now)+"\n");// format print
+	taDisplay.setStyle("-fx-text-fill:black");
+	taDisplay.appendText(msgTemp+"\n");
 });
 }
 Platform.runLater(()->{

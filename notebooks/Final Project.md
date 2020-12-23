@@ -111,3 +111,9 @@ readThread = new Thread(()->{
 
 
 线程真的是一个难点, 程序很容易崩溃,而且java也没有抛出异常.
+
+
+
+#### 亮点
+
+​	taDisplay.setStyle("-fx-text-fill:black"); 变色.但是没法让文字和日期不同颜色 , 可能是因为Platform.runLater的缘故.

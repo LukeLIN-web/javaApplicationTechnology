@@ -13,7 +13,6 @@
     <fullyQualifiedTypeName name="com.sun.tools.javac.util.Name.Table"/>
     <fullyQualifiedTypeName name="dto.People"/>
     <fullyQualifiedTypeName name="databasebyjava.people"/>
-    <fullyQualifiedTypeName name="java.lang.System"/>
     <fullyQualifiedTypeName name="java.sql.ResultSetMetaData"/>
     <fullyQualifiedTypeName name="java.sql.DatabaseMetaData"/>
     <fullyQualifiedTypeName name="java.sql.ResultSet"/>
@@ -21,4 +20,12 @@
     <fullyQualifiedTypeName name="java.lang.String"/>
     <fullyQualifiedTypeName name="databasebyjava.t_user"/>
     <fullyQualifiedTypeName name="jdk.internal.jshell.tool.resources.l10n"/>
+    <fullyQualifiedTypeName name="java.lang.Override"/>
+    <fullyQualifiedTypeName name="javafx.application.Application"/>
+    <fullyQualifiedTypeName name="fangT.FangTclient"/>
+    <fullyQualifiedTypeName name="javafx.application.Platform"/>
+    <fullyQualifiedTypeName name="javafx.scene.input.KeyEvent"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+    <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
+    <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
 </qualifiedTypeNameHistroy>
