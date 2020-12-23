@@ -19,7 +19,7 @@ try {
 }
 
 private DatagramSocket socket = null;
-private int port = 8888;
+private int port = 9020;
 private DatagramPacket receivePacket;
 
 public void UDPServer() throws IOException {
