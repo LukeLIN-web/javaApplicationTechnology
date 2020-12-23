@@ -28,7 +28,7 @@ private TextArea taDisplay=new TextArea();//显示区域
 private TextField ipAddress=new TextField();//填写ip地址
 private TextField tfport=new TextField();//填写端口
 private Button btConn=new Button("连接");
-private UDPClient FangTclient;
+private TCPClient FangTclient;
 
 private String ip;
 private String port;
@@ -77,7 +77,7 @@ ip=ipAddress.getText().trim();
 port=tfport.getText().trim();
 
 try {
-FangTclient = new UDPClient(ip,port);
+FangTclient = new TCPClient(ip,port);
 //连接服务器之后未结束服务前禁用再次连接
 btConn.setDisable(true);
 //重新连接服务器时启用输入发送功能

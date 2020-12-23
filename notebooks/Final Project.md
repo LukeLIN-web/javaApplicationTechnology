@@ -67,3 +67,22 @@ https://www.cnblogs.com/chenzhenhong/p/13972517.html#l3
 3.错误: 找不到或无法加载主类 fangT.FtServer
 原因: java.lang.ClassNotFoundException: fangT.FtServer
 
+解决:  看一下eclipse下面的problems, 因为把不能用的文件放在了classpath里,就报错了.
+
+```
+tfSend.setOnKeyPressed(new EventHandler<KeyEvent>() {
+	@Override 
+	public void handle(KeyEvent event) { //注意这里public 顶格写会报错,必须tab
+		if(event.getCode()==KeyCode.ENTER){
+		String msg=tfSend.getText();
+		FangTclient.send(msg);//向服务器发送一串字符
+		taDisplay.appendText("客户端发送："+msg+"\n");
+```
+
+
+
+4. 错误: 缺少 JavaFX 运行时组件, 需要使用该组件来运行此应用程序
+
+App是默认启动类，自己创建一个main类，然后调用App去启动即可解决问题
+
+完成UDP
