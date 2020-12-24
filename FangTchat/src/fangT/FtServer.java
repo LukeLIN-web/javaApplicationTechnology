@@ -1,99 +1,233 @@
 package fangT;
 
-//UDPServer.java
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.*;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
 
 public class FtServer {
-
+	private ConcurrentHashMap<Socket, String> users = new ConcurrentHashMap<Socket, String>();
+	String localName = null;
+	String hostName;
+	boolean flag = false ; // in the method init flag will occur error 匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
 	public static void main(String[] args){
 		
-			new FtServer().Service();
+			try {
+				new FtServer().Service();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
-private DatagramSocket socket = null;
 private int port = 9020;
 
 private ServerSocket serverSocket;//定义服务器套接字
+private ExecutorService executorService = Executors.newCachedThreadPool();
 
-public void TCPServer() throws IOException{
+	public FtServer() throws IOException{
+		
 serverSocket =new ServerSocket(port);
-System.out.println("服务器启动监听在"+port+"端口...");
-
-}
-//单客户版本，每次只能与一个用户建立通信连接
-public void Service(){
-	try {
-		TCPServer();
-	} catch (Exception e) {
-		// TODO: handle exception
-	}
-while (true){
-	
-Socket socket=null;
-try {
-//此处程序阻塞，监听并等待用户发起连接，有连接请求就生成一个套接字
-socket=serverSocket.accept();
-
-//本地服务器控制台显示客户连接的用户信息
-System.out.println("New connection accepted:"+socket.getInetAddress());
-BufferedReader br=getReader(socket);//字符串输入流
-PrintWriter pw=getWriter(socket);//字符串输出流
-pw.println("来自服务器消息：欢迎使用本服务！");
-
-String msg=null;
-//此处程序阻塞，每次从输入流中读入一行字符串
-while ((msg=br.readLine())!=null){
-//如果用户发送信息为”bye“，就结束通信
-if(msg.equals("bye")){
-pw.println("来自服务器消息：服务器断开连接，结束服务！");
-System.out.println("客户端离开。");
-break;
-}
-pw.println("来自服务器消息："+msg);
-pw.println("来自服务器,重复消息："+msg);
-}
-}catch (IOException e){
-e.printStackTrace();
-}finally {
-try {
-if (socket!=null)
-socket.close();//关闭socket连接以及相关的输入输出流
-System.out.println("the socket has closed");
-}catch (IOException e){
-e.printStackTrace();
-}
-}
-}
+System.out.println("服务器启动监听在"+port+"端口...");  //constructor init the serversocket
 }
 // can send and receive
+	class Handler implements Runnable{
+		private Socket socket;
+		boolean isExist;
+		public Handler(Socket socket) {
+		this.socket = socket;
+		}
+		//判断用户是否已经下线
+		private Boolean isLeaved(Socket temp){
+		Boolean leave=true;
+		for(Map.Entry<Socket,String> mapEntry : users.entrySet()) {
+		if (mapEntry.getKey().equals(temp))
+		leave = false;
+		}
+		return leave;
+		}
+		
+		public void run() {
+		//本地服务器控制台显示客户端连接的用户信息
+		System.out.println("New connection accept:" + socket.getInetAddress());
+		try {
+		BufferedReader br = getReader(socket);
+		PrintWriter pw = getWriter(socket);
 
+		pw.println("From 服务器：欢迎使用服务！");
+		pw.println("请输入用户名：");
 
-public DatagramPacket udpReceive() throws IOException {
-DatagramPacket receive;
-byte[] dataR = new byte[1024];
-receive = new DatagramPacket(dataR, dataR.length);
-socket.receive(receive);
-return receive;
-}
-private PrintWriter getWriter(Socket socket) throws IOException{
+		while ((hostName=br.readLine())!=null){
+		
+		users.forEach((k,v)->{
+		if (v.equals(hostName))
+		flag =true;//线程修改了全局变量
+		});
+
+		if (!flag){
+		localName=hostName;
+		users.put(socket,hostName);
+		flag=false;
+		break;
+		}
+		else{
+		flag=false;
+		pw.println("该用户名已存在，请修改！");
+		}
+		}
+		
+		// login in   finished 
+		sendToMembers("已经上线", localName, socket);
+		pw.println("输入命令功能谢谢谢谢 ");
+		
+		String msg = null;
+		while ((msg = br.readLine()) != null) {
+			switch (msg.trim().toUpperCase()){
+				case "bye": {
+					pw.println("From 服务器：服务器已断开连接，结束服务！");
+					sendToMembers("已经下线", localName, socket);
+					System.out.println("客户端离开。");
+					break;
+					}
+				case "H":{
+					pw.println("input command function");
+					continue;
+				}
+				case "L":{
+					users.forEach( (k,v)->{
+						pw.println("user: "+ v); // lambda 
+					});
+					continue;
+				}
+				case "O":{
+					pw.println("请输入私信人的用户名：");
+					String name=br.readLine();
+					//查找map中匹配的socket，与之建立通信
+					users.forEach((k, v)->{
+					if (v.equals(name)) {
+					isExist=true;//全局变量与线程修改问题
+					}
+					});
+					//已修复用户不存在的处理逻辑
+					Socket temp=null;
+					for(Map.Entry<Socket,String> mapEntry : users.entrySet()){
+					if(mapEntry.getValue().equals(name))
+					temp = mapEntry.getKey();
+					}
+					if (isExist){
+					isExist=false;
+					//私信后有一方用户离开，另一方未知，仍然发信息而未收到回复，未处理这种情况
+					while ((msg=br.readLine())!=null){
+					if (!msg.equals("E")&&!isLeaved(temp))
+					sendToOne(msg,localName,temp);
+					else if (isLeaved(temp)){
+					pw.println("对方已经离开，已断开连接！");
+					break;
+					}
+					else{
+					pw.println("您已退出私信模式！");
+					break;
+					}
+					}
+					}
+					else
+					pw.println("用户不存在！");
+				}
+				case "G":{
+					pw.println("您已进入群聊。");
+					while ((msg=br.readLine())!=null){
+					if (!msg.equals("E")&&users.size()!=1)
+					sendToMembers(msg,localName,socket);
+					else if (users.size()==1){
+					pw.println("当前群聊无其他用户在线，已自动退出！");
+					break;
+					}
+					else {
+					pw.println("您已退出群组聊天室！");
+					break;
+					}
+					}
+				}
+				default:
+					pw.print("input sum");
+			}
+	
+
+		pw.println("From 服务器：" + msg);
+		pw.println("来自服务器,重复消息："+msg);
+		}
+		} catch (IOException e) {
+		e.printStackTrace();
+		} finally {
+		try {
+		if (socket != null)
+		socket.close();
+		} catch (IOException e) {
+		e.printStackTrace();
+		}
+		}
+		}
+	}
+	public void Service() throws IOException{
+		while(true) {
+			Socket s = null ;
+			s = serverSocket.accept();
+			Handler handler = new Handler(s);
+			executorService.execute(handler);
+		}
+	}
+
+	private PrintWriter getWriter(Socket socket) throws IOException{
 	//获得输出流缓冲区的地址
 	OutputStream socketOut=socket.getOutputStream();
 	//网络流写出需要使用flush，这里在printWriter构造方法直接设置为自动flush
 	return new PrintWriter(new OutputStreamWriter(socketOut,"utf-8"),true);
-	}
+}
 
 	private BufferedReader getReader(Socket socket) throws IOException{
 	//获得输入流缓冲区的地址
 	InputStream socketIn=socket.getInputStream();
 	return new BufferedReader(new InputStreamReader(socketIn,"utf-8"));
 	}
-public void udpSend(String msg,InetAddress ipRemote,int portRemote) throws IOException {
-DatagramPacket sendPacket;
-byte[] dataSend = msg.getBytes();
-sendPacket = new DatagramPacket(dataSend,dataSend.length,ipRemote,portRemote);
-socket.send(sendPacket);
-}
+
+	// send to all users save socket in hashmap
+	private void sendToMembers(String msg,String hostAddress,Socket mySocket) throws IOException{
+
+		PrintWriter pw;
+		OutputStream out;
+		Iterator iterator=users.entrySet().iterator();
+		while (iterator.hasNext()){
+		Map.Entry entry=(Map.Entry) iterator.next();
+		Socket tempSocket = (Socket) entry.getKey();
+		String name = (String) entry.getValue();
+		if (!tempSocket.equals(mySocket)){
+		out=tempSocket.getOutputStream();
+		pw=new PrintWriter(new OutputStreamWriter(out,"utf-8"),true);
+		pw.println(hostAddress+"："+msg);
+		}
+		}
+
+	}
+	private void sendToOne(String msg,String hostAddress,Socket another) throws IOException{
+
+		PrintWriter pw;
+		OutputStream out;
+
+		Iterator iterator=users.entrySet().iterator();
+		while (iterator.hasNext()){
+
+		Map.Entry entry=(Map.Entry) iterator.next();
+		Socket tempSocket = (Socket) entry.getKey();
+		String name = (String) entry.getValue();
+
+		if (tempSocket.equals(another)){
+		out=tempSocket.getOutputStream();
+		pw=new PrintWriter(new OutputStreamWriter(out,"utf-8"),true);
+		pw.println(hostAddress+"私信了你："+msg);
+		}
+		}
+	}
 
 }
