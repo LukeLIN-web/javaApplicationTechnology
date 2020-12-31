@@ -22,7 +22,7 @@ public class FtUser {
     		while(rs.next() ) {
        			id = rs.getInt("id"); 
     			String tmpname = rs.getString("name"); 
-    			String pasw = rs.getString("address"); 
+    			String pasw = rs.getString("password"); 
     			FtUser p  = new FtUser(id,tmpname, pasw); // pass into traditional constructor 
     			vt.add(p);
     		}
@@ -43,12 +43,12 @@ public class FtUser {
 	public FtUser(int id, String name, String pwd) {
         this.id = id;
         this.name = new String(name);
-        this.pwd = pwd;
+        this.pwd = new String(pwd);
     }
 
 
     public void setId(int id,String name) {
-    	String sql = "select * from people";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+    	String sql = "select * from ft_user";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -67,22 +67,20 @@ public class FtUser {
 		e.printStackTrace();
 		}
     }
-    
+    // 12.31 
     public void deletebyid(int id) {
-    	String sql = "select * from people";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+    	String sql = "select * from ft_user";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
 			Statement stat = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);// return a updatable resultset
 			ResultSet rsup =  stat.executeQuery(sql);
-			
-			System.out.print("\n  id  = " +id +rsup.getConcurrency());
+			System.out.print("\n  id  = " +id + rsup.getConcurrency());
 			while(rsup.next() ) {
 				System.out.println("\n  rsup.getInt(\"id\")  " + rsup.getInt("id") );
 	    		  if(id == rsup.getInt("id") ) {   // you cannot use == in string comparation.
 	    			  System.out.println("\n delete id =   " + rsup.getInt("id") );
 	    			  rsup.deleteRow();
-	    			 
 	    			  } 
 			}
 		} catch (SQLException e) { 
@@ -91,7 +89,7 @@ public class FtUser {
     }
 
     public void delete(String name) {
-		String sql = "DELETE FROM people WHERE name = ? ";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		String sql = "DELETE FROM ft_user WHERE name = ? ";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -111,9 +109,9 @@ public class FtUser {
 		e.printStackTrace();
 		}
     }
-
-    public int getAge() {
-   		String sql = "select age from people";
+    // user can search all user name from id 
+    public int getName() {
+   		String sql = "select name from ft_user";
    		try {
    			 Connection conn = DriverManager.getConnection(url,username,password);
    			 s = conn.createStatement();
@@ -122,11 +120,11 @@ public class FtUser {
    		} catch (SQLException e) { 
    		e.printStackTrace();
    		}
-        return age;
+        return id;
     }
 
     public void setAge(int age,String name) {
-		String sql = "update people set age = ? where name = ?";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		String sql = "update ft_user set age = ? where name = ?";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -147,8 +145,8 @@ public class FtUser {
 
   
 
-    public void setAddress(String address,String name) {
-		String sql = "update people set address = ? where name = ?";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+    public void setName(int id,String name) {
+		String sql = "update ft_user set name = ? where id = ?";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -157,9 +155,9 @@ public class FtUser {
 		e.printStackTrace();
 		}
 		try {
-			preSt.setString(1, address);
+			preSt.setString(1, name);
 			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
-			preSt.setString(2, name);
+			preSt.setInt(2, id);
 			System.out.print("preset  = "+preSt.toString());
 			 System.out.print(" add success! change "+preSt.executeUpdate()+" lines");
 		} catch (SQLException e) { 
@@ -167,8 +165,8 @@ public class FtUser {
 		}
     }
   
-    public void add(int id,String name,int age,String add ) {
-		String sql = "insert into people values(?, ?  ,?, ?)";//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+    public void add(String name,String pwd ) {
+		String sql = "insert into ft_user values( ?  , ?)";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -177,31 +175,25 @@ public class FtUser {
 		e.printStackTrace();
 		}
 		try {
-			preSt.setString(1, String.valueOf(id));
+			preSt.setString(1, name);
 			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
-			preSt.setString(2, name);
-			preSt.setString(3, String.valueOf(age));
-			System.out.print("preset  = "+preSt.toString());
-			preSt.setString(4, add);
-			System.out.print("preset  = "+preSt.toString());
-			 System.out.print(" change address success!"+preSt.executeUpdate());
+			preSt.setString(2, password);
+			 System.out.print(" user add success!"+preSt.executeUpdate()); // 要给一个信息给前端显示,在messagebox
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
 	}
     @Override
     public String toString() {
-        return "People{" +
+        return "ft_user{" +
                 "id=" + this.id +
                 ", name='" + this.name + '\'' +
-                ", age=" + age +
-                ", address='" + address + '\'' +
                 "}\n";// you should use String s2=new String(s1); id will change ,
     }// you can't use id to copy string in the method, name will change out of the method
     
     public static void main(String[] args) {
 		 	FtUser p = new FtUser();
-		   // p.add(5,"wangwu",15,"hangzhouyuquan");//insert into people values(2,'wangqiang' ,12,'Beijingwang');
+		   // p.add(5,"wangwu",15,"hangzhouyuquan");//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		 	//p.setAddress("hangzhouzjg","we");
 			//p.setId(5, "wangwu");
 			//p.deletebyid(1);

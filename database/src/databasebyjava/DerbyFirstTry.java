@@ -31,8 +31,8 @@ public class DerbyFirstTry {
 		System.out.println("Connected to and created database " + dbName);
 	
 		try {
-			s=conn.createStatement();
-			rs=s.executeQuery("select * from t_user");
+			s = conn.createStatement();
+			rs = s.executeQuery("select * from  tty2");
 		
 			while (rs.next()) {
 				   System.out.println(rs.getString(1));
