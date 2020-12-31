@@ -20,7 +20,7 @@ public class FtUser {
     	try {
     		rs= s.executeQuery("select * from ft_user");
     		while(rs.next() ) {
-       			id = rs.getInt("id"); 
+       			id = rs.getInt("ftid"); 
     			String tmpname = rs.getString("name"); 
     			String pasw = rs.getString("password"); 
     			FtUser p  = new FtUser(id,tmpname, pasw); // pass into traditional constructor 
@@ -78,7 +78,7 @@ public class FtUser {
 			System.out.print("\n  id  = " +id + rsup.getConcurrency());
 			while(rsup.next() ) {
 				System.out.println("\n  rsup.getInt(\"id\")  " + rsup.getInt("id") );
-	    		  if(id == rsup.getInt("id") ) {   // you cannot use == in string comparation.
+	    		  if(id == rsup.getInt("ftid") ) {   // you cannot use == in string comparation.
 	    			  System.out.println("\n delete id =   " + rsup.getInt("id") );
 	    			  rsup.deleteRow();
 	    			  } 
@@ -146,7 +146,7 @@ public class FtUser {
   
 
     public void setName(int id,String name) {
-		String sql = "update ft_user set name = ? where id = ?";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
+		String sql = "update ft_user set name = ? where ftid = ?";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -166,7 +166,7 @@ public class FtUser {
     }
   
     public void add(String name,String pwd ) {
-		String sql = "insert into ft_user values( ?  , ?)";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
+		String sql = "insert into ft_user(name,password) values( ?  , ?)";//insert into ft_user(name,password) values( 'user1', '123');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -193,11 +193,11 @@ public class FtUser {
     
     public static void main(String[] args) {
 		 	FtUser p = new FtUser();
-		   // p.add(5,"wangwu",15,"hangzhouyuquan");//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
-		 	//p.setAddress("hangzhouzjg","we");
+		    //p.add("user1","pass1");//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
+		 	//p.set("hangzhouzjg","we");
 			//p.setId(5, "wangwu");
-			//p.deletebyid(1);
-		 	System.out.println(p.vt); // show all line in the table
+			p.deletebyid(1);
+		 	//System.out.println(p.vt); // show all line in the table
 		    //p.setAge(20, "we");
 		    System.out.println(" finished");
 		}
