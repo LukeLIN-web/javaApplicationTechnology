@@ -147,3 +147,9 @@ id as primary key,
  I will create class to add password and name in
     database, delete it, find id and compare input password with password, change password.
 
+客户端发送用户密码到服务器, 服务器去数据库找是否对应,如果对应,那就显示登录成功, 连接. 如果不对应
+
+todo:设置登录按钮,
+
+注册按钮-> 客户端发送用户密码到服务器, 服务器去数据库找是否对应,如果有,那就显示已存在用户名,  如果不对应,那就add 这个. 显示注册成功. 
+

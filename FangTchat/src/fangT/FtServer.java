@@ -26,6 +26,7 @@ public class FtServer {
 		serverSocket =new ServerSocket(port);
 		System.out.println("服务器启动监听在"+port+"端口...");  //constructor init the serversocket
 	}
+
 	// can send and receive
 	class Handler implements Runnable{
 		private Socket socket;
@@ -143,8 +144,8 @@ public class FtServer {
 				e.printStackTrace();
 			} finally {
 				try {
-				if (socket != null)
-					socket.close();
+					if (socket != null)
+						socket.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

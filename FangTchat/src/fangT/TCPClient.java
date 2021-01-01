@@ -29,11 +29,11 @@ public class TCPClient {
 		public String receive(){
 			String msg=null;
 			try {
-			//从网络输入字符流中读取信息，每次只能接受一行信息
-			//不够一行时（无行结束符），该语句阻塞, 直到条件满足，程序往下运行
-			msg=br.readLine();
+				//从网络输入字符流中读取信息，每次只能接受一行信息
+				//不够一行时（无行结束符），该语句阻塞, 直到条件满足，程序往下运行
+				msg=br.readLine();
 			}catch (IOException e){
-			e.printStackTrace();
+				e.printStackTrace();
 			}
 			return msg;
 		}

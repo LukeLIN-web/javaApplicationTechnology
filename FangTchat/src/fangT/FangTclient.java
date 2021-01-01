@@ -40,8 +40,8 @@ public class FangTclient extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) { //start()方法传入的Stage对象在JavaFX程序加载时被加载（JavaFX的Stage是顶层容器）
-		BorderPane mainPane=new BorderPane();//BorderPane，是默认就分割好了上下左右中的五个部分
-		//连接服务器区域
+		BorderPane mainPane=new BorderPane();//BorderPane，默认就分割好了上下左右中的五个部分
+		//connect with server field
 		HBox hBox1=new HBox();
 		hBox1.setSpacing(10);
 		hBox1.setPadding(new Insets(10,20,10,20));
@@ -54,7 +54,7 @@ public class FangTclient extends Application {
 		vBox.setPadding(new Insets(10,20,10,20));
 		vBox.getChildren().addAll(new javafx.scene.control.Label("信息显示区"),taDisplay,new Label("信息输入区"),tfSend);
 		VBox.setVgrow(taDisplay, Priority.ALWAYS);
-		mainPane.setCenter(vBox);//居中
+		mainPane.setCenter(vBox);
 		
 		HBox hBox=new HBox();
 		hBox.setSpacing(10);
@@ -68,10 +68,11 @@ public class FangTclient extends Application {
 		primaryStage.show();// Display the stage
 		primaryStage.setTitle("FangTangChatRoom");// Set the stage title
 		primaryStage.getIcons().add(new Image("LOGO2.png"));
-		//连接按钮
+		
+		//连接按钮触发的事件用lambda函数表示 , 
 		btConn.setOnAction(event -> {
 		String usr = username.getText().trim();
-		String pwd= password.getText().trim();
+		String pwd= password.getText().trim();// remove the space
 		
 			try {
 			//tcpClient是本程序定义的一个TCPClient类型的成员变量
@@ -103,10 +104,11 @@ public class FangTclient extends Application {
 			}
 		});
 	// btConn.defaultButtonProperty();
+		
 	//发送按钮事件
 	btnSend.setOnAction(event -> {
 		String msg=tfSend.getText();
-		tcpClient.send(msg);//向服务器发送一串字符
+		tcpClient.send(msg);//向服务器发送一串字符 用户名和密码
 		taDisplay.appendText("客户端发送："+msg+"\n");
 		if (msg.equalsIgnoreCase("bye")){
 			btnSend.setDisable(true);//发送bye后禁用发送按钮
@@ -116,6 +118,7 @@ public class FangTclient extends Application {
 		}
 		tfSend.clear();
 	});
+	
 	//对输入区域绑定键盘事件
 	tfSend.setOnKeyPressed(new EventHandler<KeyEvent>() {
 		@Override
@@ -143,6 +146,7 @@ public class FangTclient extends Application {
 				e.printStackTrace();
 			}
 		});
+		
 	//窗体关闭响应的事件,点击右上角的×关闭,客户端也关闭
 		primaryStage.setOnCloseRequest(event -> {
 			try {

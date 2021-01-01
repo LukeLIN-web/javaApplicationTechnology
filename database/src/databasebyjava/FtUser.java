@@ -68,28 +68,9 @@ public class FtUser {
 		}
     }
     // 12.31 
-    public void deletebyid(int id) {
-    	String sql = "select * from ft_user";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
-		System.out.print(sql);
-		try {
-			Connection conn = DriverManager.getConnection(url,username,password);
-			Statement stat = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);// return a updatable resultset
-			ResultSet rsup =  stat.executeQuery(sql);
-			System.out.print("\n  id  = " +id + rsup.getConcurrency());
-			while(rsup.next() ) {
-				System.out.println("\n  rsup.getInt(\"id\")  " + rsup.getInt("id") );
-	    		  if(id == rsup.getInt("ftid") ) {   // you cannot use == in string comparation.
-	    			  System.out.println("\n delete id =   " + rsup.getInt("id") );
-	    			  rsup.deleteRow();
-	    			  } 
-			}
-		} catch (SQLException e) { 
-		e.printStackTrace();
-		}
-    }
 
-    public void delete(String name) {
-		String sql = "DELETE FROM ft_user WHERE name = ? ";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
+    public void delete(int ftid) {
+		String sql = "DELETE FROM ft_user WHERE ftid = ? ";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -98,8 +79,8 @@ public class FtUser {
 		e.printStackTrace();
 		}
 		try {
-			preSt.setString(1, name);
-			System.out.print("\n  name  = " +name);
+			preSt.setInt(1, ftid);
+			System.out.print("\n  name  = " );
 			int line = preSt.executeUpdate();
 			if(line > 0)
 			 System.out.print(" delete  success! change "+line+" lines");
@@ -123,8 +104,9 @@ public class FtUser {
         return id;
     }
 
-    public void setAge(int age,String name) {
-		String sql = "update ft_user set age = ? where name = ?";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
+    // password 不能change 12.31 16:06 为什么呢?
+    public void setPassword(int ftid,String pwd) {
+		String sql = "update ft_user set password = ? where ftid = ?";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
@@ -133,11 +115,11 @@ public class FtUser {
 		e.printStackTrace();
 		}
 		try {
-			preSt.setString(1, String.valueOf(age));
-			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
-			preSt.setString(2, name);
+			preSt.setString(1, pwd);
+			System.out.print("id =  "+String.valueOf(ftid));
+			preSt.setInt(2, ftid);
 			System.out.print("preset  = "+preSt.toString());
-			 System.out.print(" set age  success! change "+preSt.executeUpdate()+" lines");
+			 System.out.print(" set password  success! change "+preSt.executeUpdate()+" lines");
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
@@ -159,7 +141,7 @@ public class FtUser {
 			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
 			preSt.setInt(2, id);
 			System.out.print("preset  = "+preSt.toString());
-			 System.out.print(" add success! change "+preSt.executeUpdate()+" lines");
+			 System.out.print(" set name success! change "+preSt.executeUpdate()+" lines");
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
@@ -177,7 +159,7 @@ public class FtUser {
 		try {
 			preSt.setString(1, name);
 			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
-			preSt.setString(2, password);
+			preSt.setString(2, pwd);// 你可以通过把pwd改成password来统一设置密码为111111
 			 System.out.print(" user add success!"+preSt.executeUpdate()); // 要给一个信息给前端显示,在messagebox
 		} catch (SQLException e) { 
 		e.printStackTrace();
@@ -188,17 +170,17 @@ public class FtUser {
         return "ft_user{" +
                 "id=" + this.id +
                 ", name='" + this.name + '\'' +
+                ",pwd ="+this.pwd+
                 "}\n";// you should use String s2=new String(s1); id will change ,
     }// you can't use id to copy string in the method, name will change out of the method
     
     public static void main(String[] args) {
 		 	FtUser p = new FtUser();
-		    //p.add("user1","pass1");//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
-		 	//p.set("hangzhouzjg","we");
-			//p.setId(5, "wangwu");
-			p.deletebyid(1);
-		 	//System.out.println(p.vt); // show all line in the table
-		    //p.setAge(20, "we");
+		    //p.add("user2","pass2");//注册, 已完成
+		 	//p.setPassword(102, "pass101");//修改密码, 已完成
+		 	//p.setName(1, "usertry");// 修改名字, 已完成
+			//p.delete(2);// 通过ftid 删除已完成
+		 	System.out.println(p.vt); // show all line in the table
 		    System.out.println(" finished");
 		}
 }
