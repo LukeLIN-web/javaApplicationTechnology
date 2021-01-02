@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -22,11 +23,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class FangTclient extends Application {
-	
-	private Button btnExit=new Button("退出");
-	private Button btnSend = new Button("发送");
+	Image imageOk = new Image("error-1.png");
+	Image imagesend = new Image("envelope.png");
+	private Button btnExit=new Button("退出",new ImageView(imageOk));  
+	private Button btnSend = new Button("发送",new ImageView(imagesend));
 	private TextField tfSend=new TextField();//输入信息区域
 	private TextArea taDisplay = new TextArea();//显示区域
 	private TextField username = new TextField();//填写用户名
@@ -43,76 +46,11 @@ public class FangTclient extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) { //start()方法传入的Stage对象在JavaFX程序加载时被加载（JavaFX的Stage是顶层容器）
-		BorderPane mainPane=new BorderPane();//BorderPane，默认就分割好了上下左右中的五个部分
-		//connect with server field
-		HBox hBox1=new HBox();
-		hBox1.setSpacing(10);
-		hBox1.setPadding(new Insets(10,20,10,20));
-		hBox1.setAlignment(Pos.CENTER);
-		hBox1.getChildren().addAll(new Label("用户名："),username,new Label("密码："),password,btConn,btLog,btRegst);// 从左到右horizon
-		mainPane.setTop(hBox1);// 放上方
-		
-		VBox vBox=new VBox();//vertical box 
-		vBox.setSpacing(10);
-		vBox.setPadding(new Insets(10,20,10,20));
-		vBox.getChildren().addAll(new javafx.scene.control.Label("信息显示区"),taDisplay,new Label("信息输入区"),tfSend);
-		VBox.setVgrow(taDisplay, Priority.ALWAYS);
-		mainPane.setCenter(vBox);
-		
-		HBox hBox=new HBox();
-		hBox.setSpacing(10);
-		hBox.setPadding(new Insets(10,20,10,20));
-		hBox.setAlignment(Pos.CENTER_RIGHT);
-		hBox.getChildren().addAll(btnSend,btnExit);
-		mainPane.setBottom(hBox);//下方 
-		
-		Scene scene =new Scene(mainPane,700,500);
-		primaryStage.setScene(scene);// Place the scene in the stage
-		primaryStage.show();// Display the stage
-		primaryStage.setTitle("FangTangChatRoom");// Set the stage title
-		primaryStage.getIcons().add(new Image("LOGO2.png"));
-		
-		//连接按钮触发的事件用lambda函数表示 , 
-		btConn.setOnAction(event -> {
-		String usr = username.getText().trim();
-		String pwd= password.getText().trim();// remove the space
-		
-			try {
-			//tcpClient是本程序定义的一个TCPClient类型的成员变量
-			tcpClient = new TCPClient("localhost", "9020");
-			//用于接收服务器信息的单独线程
-			readThread = new Thread(()->{
-				String receiveMsg=null;//从服务器接收一串字符
-				while ((receiveMsg=tcpClient.receive()) != null){
-					//lambda表达式不能直接访问外部非final类型局部变量，需要定义一个临时变量,若将receiveMsg定义为类成员变量，则无需临时变量
-					String msgTemp = receiveMsg;
-					Platform.runLater(()->{
-						LocalDateTime now = LocalDateTime.now();
-						DateTimeFormatter dtf= DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
-						taDisplay.appendText(dtf.format(now)+"\n");// format print
-						taDisplay.setStyle("-fx-text-fill:black");
-						taDisplay.appendText(msgTemp+"\n");
-					});
-				}
-				Platform.runLater(()->{
-					taDisplay.appendText("对话已关闭！\n");
-				});
-			});
-				readThread.start();			
-				btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
-				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
-				btnSend.setDisable(false);
-			}catch (Exception e){
-				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
-			}
-		});
+		adjustStyle(primaryStage);
 	// btConn.defaultButtonProperty();
-
-	btnSend.setOnAction(new BtnSendHandler() );
-	//对输入区域绑定键盘事件
-	tfSend.setOnKeyPressed(new PressSendHandler() );
-	
-	
+		btConn.setOnAction(new BtnConnHandler() );
+		btnSend.setOnAction(new BtnSendHandler() );
+		tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
 		btnExit.setOnAction(event -> {
 			try {
 				exit();
@@ -129,6 +67,75 @@ public class FangTclient extends Application {
 				e.printStackTrace();
 			}
 		});
+	}
+	// 把前端的工作分离出start();
+	public void adjustStyle(Stage primaryStage) {
+		BorderPane mainPane=new BorderPane();//BorderPane，默认就分割好了上下左右中的五个部分
+		//connect with server field
+		HBox hBox1=new HBox();
+		hBox1.setSpacing(10);
+		hBox1.setPadding(new Insets(10,20,10,20));//setPadding()：以外部控件的角度，规定其内部控件与其的距离
+		hBox1.setAlignment(Pos.CENTER);
+		hBox1.getChildren().addAll(new Label("用户名："),username,new Label("密码："),password,btConn,btLog,btRegst);// 从左到右horizon
+		mainPane.setTop(hBox1);// 放上方
+		
+		VBox vBox=new VBox();//vertical box 
+		vBox.setSpacing(10); //设置单行面板组件的间距为10像素
+		vBox.setPadding(new Insets(10,20,10,20));
+		vBox.getChildren().addAll(new javafx.scene.control.Label("信息显示区"),taDisplay,new Label("信息输入区"),tfSend);
+		VBox.setVgrow(taDisplay, Priority.ALWAYS);
+		mainPane.setCenter(vBox);
+		
+		HBox hBox=new HBox();
+		hBox.setSpacing(10);
+		hBox.setPadding(new Insets(10,20,10,20));
+		hBox.setAlignment(Pos.CENTER_RIGHT);
+		hBox.getChildren().addAll(btnSend,btnExit);
+		btnSend.setStyle("-fx-background-color:linear-gradient(#E4EAA2, #9CD672);");//-fx-border-color:black; -fx-padding:3px;-fx-background-color:POWDERBLUE;
+		mainPane.setBottom(hBox);//下方 
+		
+		Scene scene =new Scene(mainPane,700,500);//scene is a tree-structure,其根节点一般是Pane面板（如StackPane、BorderPane
+		primaryStage.setScene(scene);// Place the scene in the stage,Stage包含Scene，Scene包含一个或者多个node节点
+		primaryStage.show();// Display the stage
+		primaryStage.setTitle("FangTangChatRoom");// Set the stage title
+		primaryStage.getIcons().add(new Image("LOGO2.png"));//Stage相当于swing的Jwindow,一个Stage必须至少有一个Scene.Scene相当于JFrame,包含一个或者多个node节点
+		
+	}
+	class BtnConnHandler implements EventHandler<ActionEvent>{ //连接按钮触发的事件原先用lambda函数表示 , 改写为单独的类
+		String usr = username.getText().trim();
+		String pwd= password.getText().trim();// remove the space
+		@Override
+		public void handle(ActionEvent event) {
+			try {
+			//tcpClient是本程序定义的一个TCPClient类型的成员变量
+			tcpClient = new TCPClient("localhost", "9020");
+			//用于接收服务器信息的单独线程
+			readThread = new Thread(()->{
+				String receiveMsg=null;//从服务器接收一串字符
+				while ((receiveMsg=tcpClient.receive()) != null){
+					//lambda表达式不能直接访问外部非final类型局部变量，需要定义一个临时变量,若将receiveMsg定义为类成员变量，则无需临时变量
+					String msgTemp = receiveMsg;
+					Platform.runLater(()->{
+						LocalDateTime now = LocalDateTime.now();
+						DateTimeFormatter dtf= DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+						taDisplay.appendText(dtf.format(now)+"\n");// format print
+						taDisplay.setStyle("-fx-text-fill:black");
+						taDisplay.appendText(msgTemp+"\n");
+					
+					});
+				}
+				Platform.runLater(()->{
+					taDisplay.appendText("对话已关闭！\n");
+				});
+			});
+				readThread.start();			
+				btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
+				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
+				btnSend.setDisable(false);
+			}catch (Exception e){
+				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
+			}
+		}
 	}
 	class BtnSendHandler implements  EventHandler<ActionEvent>{
 		@Override
@@ -148,7 +155,7 @@ public class FangTclient extends Application {
 	class PressSendHandler implements EventHandler<KeyEvent>{
 		@Override
 		public void handle(KeyEvent event) {
-			if(event.getCode()==KeyCode.ENTER){
+			if(event.getCode()==KeyCode.ENTER){ //或许可以把他改成
 				String msg=tfSend.getText();
 				tcpClient.send(msg);//向服务器发送一串字符
 				taDisplay.appendText("客户端发送："+msg+"\n");
