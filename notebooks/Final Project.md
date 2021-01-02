@@ -14,7 +14,9 @@
 
 接下来, 我觉得不需要输入端口,首先把端口和local固定. 用户名和密码
 
-1月1日-1月9日 撰写大程序报告，调试，制作视频，
+
+
+1月2日 , 实现了每次加入一个客户端, 服务器就会输出一次连接的客户端主机名和IP地址.
 
  1月10日-1月14日 撰写大程序最终版报告
 
@@ -154,48 +156,23 @@ todo:设置登录按钮,
 
 ##### 使用序列化：
 
-先将需要发送的内容构建为一个类,我们定义一个作为注册的信号.
+先将需要发送的内容构建为一个类,我们定义一个作为注册的信号. 但是java序列化其实是不安全的.而且接收的时候, 接收bufferreader和objectreader可以同时存在吗? 可以同时接收吗?
+
+不知道, 不如全部用dataoutputstream把! 这样应该可以.
 
 ```
 [Serializable]
 public class WBMessage
 {
-public byte _number;
-public short IP_Port;
-public string IP_Address;
+    public byte _number;
+    public short IP_Port;
+    public string IP_Address;
 }
 ```
 
-发送前序列化
+发送前序列化,接收后反序列化
 
-发送前序列化
 
-```
-public MemoryStream Serialize(WBMessage msg)
-{
-MemoryStream ms= new MemoryStream(); 
-BinaryFormatter formatter= new BinaryFormatter();
-formatter.AssemblyFormat= FormatterAssemblyStyle.Simple;
-formatter.TypeFormat= FormatterTypeStyle.TypesWhenNeeded;
-formatter.Serialize(ms,msg);
-return ms;
-}
-```
-
-接收后反序列化
-
-```
-public WBMessage Deserialize(byte [] bytes, int offset, int count)
-{
-MemoryStream ms = new MemoryStream(bytes, offset, count);
-BinaryFormatter formatter = new BinaryFormatter();
-formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
-formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
-WBMessage msg;
-msg = (WBMessage)formatter.Deserialize(ms);
-return msg;
-}
-```
 
 
 

@@ -1,5 +1,6 @@
 package fangT;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -24,7 +25,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 
-public class FangTclient extends Application {
+public class FangTclient extends Application implements FangTangConstants{
 	Image imagesend = new Image("envelope.png");
 	private Button btnExit=new Button("退出");  
 	private Button btnSend = new Button("发送",new ImageView(imagesend));
@@ -106,6 +107,15 @@ public class FangTclient extends Application {
 		String pwd= password.getText().trim();// remove the space
 		@Override
 		public void handle(ActionEvent event) {
+			try {
+				tcpClient.objSend(usr,pwd,2);//注册, id =2 , name 
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			taDisplay.appendText("注册中\n");
+			username.clear();
+			password.clear();
 		}
 	}
 	
@@ -116,16 +126,16 @@ public class FangTclient extends Application {
 		public void handle(ActionEvent event) {
 			try {
 			//tcpClient是本程序定义的一个TCPClient类型的成员变量
-			tcpClient = new TCPClient("localhost", "9020");
+			tcpClient = new TCPClient("localhost", String.valueOf(port));
 			//用于接收服务器信息的单独线程
 			readThread = new Thread(()->{
-				String receiveMsg=null;//从服务器接收一串字符
-				while ((receiveMsg=tcpClient.receive()) != null){
+				String receiveMsg = null;//从服务器接收一串字符
+				while ((receiveMsg = tcpClient.receive()) != null){
 					//lambda表达式不能直接访问外部非final类型局部变量，需要定义一个临时变量,若将receiveMsg定义为类成员变量，则无需临时变量
 					String msgTemp = receiveMsg;
-					Platform.runLater(()->{
+					Platform.runLater(()->{// 稍后更新GUI
 						LocalDateTime now = LocalDateTime.now();
-						DateTimeFormatter dtf= DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
 						taDisplay.appendText(dtf.format(now)+"\n");// format print
 						taDisplay.setStyle("-fx-text-fill:black");
 						taDisplay.appendText(msgTemp+"\n");
