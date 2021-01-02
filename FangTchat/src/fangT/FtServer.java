@@ -46,7 +46,7 @@ public class FtServer {
 		
 		public void run() {//本地服务器控制台显示客户端连接的用户信息
 			System.out.println("New connection accept:" + socket.getInetAddress());
-			try {
+			try { 
 				BufferedReader br = getReader(socket);
 				PrintWriter pw = getWriter(socket);
 				pw.println("From 服务器：欢迎使用服务！\n 请输入用户名：" );//remind user to input username
@@ -62,13 +62,14 @@ public class FtServer {
 					}
 					else{
 						flag=false;// use flag to avoid same name
-						pw.println("该用户名已存在，请修改！");
-					}
+						pw.println("该用户名已存在，请修改！");//存在bug, 一旦用户名存在, 连接就会禁用, 但是还没有连接上, java.net.SocketException: Socket is closed
+					}// 失败了, 服务器要转发一个信息回去把连接按钮enable
 				}
 				sendToMembers("已经上线", localName, socket);//login in success
 				pw.println("输入命令功能谢谢谢谢 ");
-				
+				//下面这些太冗长了, 怎么处理?
 				String msg = null;
+			
 				while ((msg = br.readLine()) != null) {
 					switch (msg.trim().toUpperCase()){
 						case "BYE": {// exit

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -106,40 +107,11 @@ public class FangTclient extends Application {
 			}
 		});
 	// btConn.defaultButtonProperty();
-		
-	//发送按钮事件
-	btnSend.setOnAction(event -> {
-		String msg=tfSend.getText();
-		tcpClient.send(msg);//向服务器发送一串字符 用户名和密码
-		taDisplay.appendText("客户端发送："+msg+"\n");
-		if (msg.equalsIgnoreCase("bye")){
-			btnSend.setDisable(true);//发送bye后禁用发送按钮
-			tfSend.setDisable(true);//禁用Enter发送信息输入区域
-			//结束服务后再次启用连接按钮
-			btConn.setDisable(false);
-		}
-		tfSend.clear();
-	});
-	
+
+	btnSend.setOnAction(new BtnSendHandler() );
 	//对输入区域绑定键盘事件
-	tfSend.setOnKeyPressed(new EventHandler<KeyEvent>() {
-		@Override
-		public void handle(KeyEvent event) {
-			if(event.getCode()==KeyCode.ENTER){
-				String msg=tfSend.getText();
-				tcpClient.send(msg);//向服务器发送一串字符
-				taDisplay.appendText("客户端发送："+msg+"\n");
-				
-				if (msg.equalsIgnoreCase("bye")){ //业务逻辑应该分离出来, 不应该在键盘事件中. 服务器发送一个禁用给你, 然后你的禁用.
-					tfSend.setDisable(true);//禁用Enter发送信息输入区域, 
-					btnSend.setDisable(true);//发送bye后禁用发送按钮
-					//结束服务后再次启用连接按钮
-					btConn.setDisable(false);// 两个bye的代码, 这好愚蠢, 我可不可以把msg抽象出来, 只要发送了bye, 那就禁用.
-				}
-				tfSend.clear();
-			}
-		}
-	});
+	tfSend.setOnKeyPressed(new PressSendHandler() );
+	
 	
 		btnExit.setOnAction(event -> {
 			try {
@@ -158,7 +130,39 @@ public class FangTclient extends Application {
 			}
 		});
 	}
-
+	class BtnSendHandler implements  EventHandler<ActionEvent>{
+		@Override
+		public void handle(ActionEvent event) {
+			String msg=tfSend.getText();
+			tcpClient.send(msg);//向服务器发送一串字符 用户名和密码
+			taDisplay.appendText("客户端发送："+msg+"\n");
+			if (msg.equalsIgnoreCase("bye")){ //业务逻辑写在里面, 比较冗长.
+				btnSend.setDisable(true);//发送bye后禁用发送按钮
+				tfSend.setDisable(true);//禁用Enter发送信息输入区域
+				//结束服务后再次启用连接按钮
+				btConn.setDisable(false);
+			}
+			tfSend.clear();
+		}
+	}
+	class PressSendHandler implements EventHandler<KeyEvent>{
+		@Override
+		public void handle(KeyEvent event) {
+			if(event.getCode()==KeyCode.ENTER){
+				String msg=tfSend.getText();
+				tcpClient.send(msg);//向服务器发送一串字符
+				taDisplay.appendText("客户端发送："+msg+"\n");
+				
+				if (msg.equalsIgnoreCase("bye")){ //业务逻辑应该分离出来, 不应该在键盘事件中. 服务器发送一个禁用给你, 然后你的禁用.
+					tfSend.setDisable(true);//禁用Enter发送信息输入区域, 
+					btnSend.setDisable(true);//发送bye后禁用发送按钮
+					//结束服务后再次启用连接按钮
+					btConn.setDisable(false);// 两个bye的代码, 这好愚蠢, 我可不可以把msg抽象出来, 只要发送了bye, 那就禁用.
+				}
+				tfSend.clear();
+			}
+		}
+	}
 	private void exit() throws InterruptedException {
 		if (tcpClient!=null){
 			tcpClient.send("bye");
