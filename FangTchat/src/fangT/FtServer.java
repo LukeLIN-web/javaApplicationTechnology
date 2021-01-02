@@ -23,7 +23,7 @@ public class FtServer {
 	private ServerSocket serverSocket;//定义服务器套接字
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	public FtServer() throws IOException{		
-		serverSocket =new ServerSocket(port);
+		serverSocket = new ServerSocket(port);
 		System.out.println("服务器启动监听在"+port+"端口...");  //constructor init the serversocket
 	}
 
@@ -31,7 +31,7 @@ public class FtServer {
 	class Handler implements Runnable{
 		private Socket socket;
 		boolean isExist;
-		public Handler(Socket socket) {
+		public Handler(Socket socket) {// constructor
 			this.socket = socket;
 		}
 		//判断用户是否已经下线
@@ -50,7 +50,7 @@ public class FtServer {
 				BufferedReader br = getReader(socket);
 				PrintWriter pw = getWriter(socket);
 				pw.println("From 服务器：欢迎使用服务！\n 请输入用户名：" );//remind user to input username
-				while ((hostName=br.readLine())!=null){
+				while ((hostName = br.readLine())!=null){
 					users.forEach((k,v)->{
 					if (v.equals(hostName))
 						flag =true;//线程修改了全局变量
@@ -153,6 +153,8 @@ public class FtServer {
 			}
 		}
 	}
+	
+	
 	public void Service() throws IOException{
 		while(true) {
 			Socket s = null ;
@@ -163,16 +165,16 @@ public class FtServer {
 	}
 
 	private PrintWriter getWriter(Socket socket) throws IOException{
-	//获得输出流缓冲区的地址
-	OutputStream socketOut=socket.getOutputStream();
-	//网络流写出需要使用flush，这里在printWriter构造方法直接设置为自动flush
-	return new PrintWriter(new OutputStreamWriter(socketOut,"utf-8"),true);
-}
+		//获得输出流缓冲区的地址
+		OutputStream socketOut = socket.getOutputStream();
+		//网络流写出需要使用flush，这里在printWriter构造方法直接设置为自动flush
+		return new PrintWriter(new OutputStreamWriter(socketOut,"utf-8"),true);
+	}
 
 	private BufferedReader getReader(Socket socket) throws IOException{
-	//获得输入流缓冲区的地址
-	InputStream socketIn=socket.getInputStream();
-	return new BufferedReader(new InputStreamReader(socketIn,"utf-8"));
+		//获得输入流缓冲区的地址
+		InputStream socketIn = socket.getInputStream();
+		return new BufferedReader(new InputStreamReader(socketIn,"utf-8"));
 	}
 
 	// send to all users save socket in hashmap

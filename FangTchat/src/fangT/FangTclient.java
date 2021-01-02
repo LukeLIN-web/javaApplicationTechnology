@@ -22,13 +22,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 
 public class FangTclient extends Application {
-	Image imageOk = new Image("error-1.png");
 	Image imagesend = new Image("envelope.png");
-	private Button btnExit=new Button("退出",new ImageView(imageOk));  
+	private Button btnExit=new Button("退出");  
 	private Button btnSend = new Button("发送",new ImageView(imagesend));
 	private TextField tfSend=new TextField();//输入信息区域
 	private TextArea taDisplay = new TextArea();//显示区域
@@ -51,6 +49,7 @@ public class FangTclient extends Application {
 		btConn.setOnAction(new BtnConnHandler() );
 		btnSend.setOnAction(new BtnSendHandler() );
 		tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
+		btRegst.setOnAction(new BtnRegstHandler());
 		btnExit.setOnAction(event -> {
 			try {
 				exit();
@@ -101,7 +100,16 @@ public class FangTclient extends Application {
 		primaryStage.getIcons().add(new Image("LOGO2.png"));//Stage相当于swing的Jwindow,一个Stage必须至少有一个Scene.Scene相当于JFrame,包含一个或者多个node节点
 		
 	}
-	class BtnConnHandler implements EventHandler<ActionEvent>{ //连接按钮触发的事件原先用lambda函数表示 , 改写为单独的类
+	// 按下注册按钮, 户端发送用户密码到服务器, 服务器去数据库找是否对应,如果有,那就显示已存在用户名,  如果不对应,那就add 这个. 显示注册成功. 
+	class BtnRegstHandler implements EventHandler<ActionEvent>{
+		String usr = username.getText().trim();
+		String pwd= password.getText().trim();// remove the space
+		@Override
+		public void handle(ActionEvent event) {
+		}
+	}
+	
+	class BtnConnHandler implements EventHandler<ActionEvent>{ //连接按钮触发的事件原先用lambda函数表示 , now 改写为单独的类
 		String usr = username.getText().trim();
 		String pwd= password.getText().trim();// remove the space
 		@Override
@@ -137,10 +145,11 @@ public class FangTclient extends Application {
 			}
 		}
 	}
+	
 	class BtnSendHandler implements  EventHandler<ActionEvent>{
 		@Override
 		public void handle(ActionEvent event) {
-			String msg=tfSend.getText();
+			String msg = tfSend.getText();
 			tcpClient.send(msg);//向服务器发送一串字符 用户名和密码
 			taDisplay.appendText("客户端发送："+msg+"\n");
 			if (msg.equalsIgnoreCase("bye")){ //业务逻辑写在里面, 比较冗长.

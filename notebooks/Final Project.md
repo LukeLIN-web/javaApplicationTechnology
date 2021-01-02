@@ -152,6 +152,53 @@ todo:设置登录按钮,
 
 注册按钮-> 客户端发送用户密码到服务器, 服务器去数据库找是否对应,如果有,那就显示已存在用户名,  如果不对应,那就add 这个. 显示注册成功. 
 
+##### 使用序列化：
+
+先将需要发送的内容构建为一个类,我们定义一个作为注册的信号.
+
+```
+[Serializable]
+public class WBMessage
+{
+public byte _number;
+public short IP_Port;
+public string IP_Address;
+}
+```
+
+发送前序列化
+
+发送前序列化
+
+```
+public MemoryStream Serialize(WBMessage msg)
+{
+MemoryStream ms= new MemoryStream(); 
+BinaryFormatter formatter= new BinaryFormatter();
+formatter.AssemblyFormat= FormatterAssemblyStyle.Simple;
+formatter.TypeFormat= FormatterTypeStyle.TypesWhenNeeded;
+formatter.Serialize(ms,msg);
+return ms;
+}
+```
+
+接收后反序列化
+
+```
+public WBMessage Deserialize(byte [] bytes, int offset, int count)
+{
+MemoryStream ms = new MemoryStream(bytes, offset, count);
+BinaryFormatter formatter = new BinaryFormatter();
+formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
+formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
+WBMessage msg;
+msg = (WBMessage)formatter.Deserialize(ms);
+return msg;
+}
+```
+
+
+
 如 ，`setOnAction(EventHandler)``setOnMouseClicked(EventHandler)`
 
 第二种是使用`addEventHandler(MouseEvent.MOUSE_CLICKED, EventHandler)` 有啥区别?
