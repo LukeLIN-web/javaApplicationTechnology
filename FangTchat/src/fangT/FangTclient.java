@@ -31,6 +31,8 @@ public class FangTclient extends Application {
 	private TextField username = new TextField();//填写用户名
 	private TextField password = new TextField();//填写密码
 	private Button btConn=new Button("连接");
+	private Button btLog=new Button("登录");
+	private Button btRegst=new Button("注册");
 	private TCPClient tcpClient;
 	private Thread readThread;
 		
@@ -46,7 +48,7 @@ public class FangTclient extends Application {
 		hBox1.setSpacing(10);
 		hBox1.setPadding(new Insets(10,20,10,20));
 		hBox1.setAlignment(Pos.CENTER);
-		hBox1.getChildren().addAll(new Label("用户名："),username,new Label("密码："),password,btConn);// 从左到右horizon
+		hBox1.getChildren().addAll(new Label("用户名："),username,new Label("密码："),password,btConn,btLog,btRegst);// 从左到右horizon
 		mainPane.setTop(hBox1);// 放上方
 		
 		VBox vBox=new VBox();//vertical box 
@@ -80,7 +82,7 @@ public class FangTclient extends Application {
 			//用于接收服务器信息的单独线程
 			readThread = new Thread(()->{
 				String receiveMsg=null;//从服务器接收一串字符
-				while ((receiveMsg=tcpClient.receive())!=null){
+				while ((receiveMsg=tcpClient.receive()) != null){
 					//lambda表达式不能直接访问外部非final类型局部变量，需要定义一个临时变量,若将receiveMsg定义为类成员变量，则无需临时变量
 					String msgTemp = receiveMsg;
 					Platform.runLater(()->{
@@ -128,11 +130,11 @@ public class FangTclient extends Application {
 				tcpClient.send(msg);//向服务器发送一串字符
 				taDisplay.appendText("客户端发送："+msg+"\n");
 				
-				if (msg.equalsIgnoreCase("bye")){
-					tfSend.setDisable(true);//禁用Enter发送信息输入区域
+				if (msg.equalsIgnoreCase("bye")){ //业务逻辑应该分离出来, 不应该在键盘事件中. 服务器发送一个禁用给你, 然后你的禁用.
+					tfSend.setDisable(true);//禁用Enter发送信息输入区域, 
 					btnSend.setDisable(true);//发送bye后禁用发送按钮
 					//结束服务后再次启用连接按钮
-					btConn.setDisable(false);
+					btConn.setDisable(false);// 两个bye的代码, 这好愚蠢, 我可不可以把msg抽象出来, 只要发送了bye, 那就禁用.
 				}
 				tfSend.clear();
 			}
