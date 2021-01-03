@@ -1,6 +1,9 @@
 package fangT;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -38,7 +41,11 @@ public class FangTclient extends Application implements FangTangConstants{
 	private Button btRegst=new Button("注册");
 	private TCPClient tcpClient;
 	private Thread readThread;
-		
+	private DataInputStream fromServer;
+	private DataOutputStream toServer;
+	public  boolean continueToSend = true;
+	public  boolean waiting = true;
+	private String msg = "try a massge";
 	public static void main(String[] args) {
 		launch(args);//用来启动整个Application的
 	}
@@ -66,7 +73,78 @@ public class FangTclient extends Application implements FangTangConstants{
 				e.printStackTrace();
 			} 
 		});
+		connectToserver();
 	}
+	private void connectToserver() {
+		try {
+			Socket socket = new Socket("localhost",port);
+			toServer = new DataOutputStream(socket.getOutputStream());
+			fromServer = new DataInputStream(socket.getInputStream());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		new Thread( () ->{
+			try {
+				int logstatus = fromServer.readInt();//服务器告诉他可以开始了
+				if (logstatus == CONNECTSUCCESS) {
+					Platform.runLater( ()->{
+						taDisplay.appendText("	连接成功!!! \n");
+					});
+					
+					// todo: 可以开始.
+				} else if (logstatus == CONNECTFAIL) {
+					Platform.runLater( ()->{
+						taDisplay.appendText("	连接失败!!! \n");
+					});
+					//todo :重新尝试连接.
+				}
+				while(continueToSend) {
+					waitForSendAction();
+					sendMessage();
+					receiveInfoFromServer();
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		).start();
+	}
+	
+	private void waitForSendAction() throws InterruptedException {
+		while (waiting) {
+			Thread.sleep(100);
+		}
+		waiting = true;
+	}
+	
+	private void sendMessage() throws IOException{
+		toServer.writeBytes(msg);// change massage in different place
+	}
+	private void receiveInfoFromServer() throws IOException{
+		int currentStatus = fromServer.readInt();
+		
+		if (currentStatus == STOPSEND) {
+			continueToSend = false;
+			Platform.runLater( ()->{
+				taDisplay.appendText("	停止发送!!! \n");
+			});
+		}
+		else if(currentStatus == CONTINUESEND){ // 约定好, 先发CONTINUESEND,然后再发字符串.
+			reveiveMsg();//把接收和事件分离开, 而不是在这里readutf
+			Platform.runLater( ()->{
+				taDisplay.appendText("可以继续发送");
+			});
+		}
+	}
+	
+	private void reveiveMsg() throws IOException{
+		String tmp = fromServer.readUTF();
+		Platform.runLater( ()->{
+			taDisplay.appendText(tmp);
+		});
+	}
+	
 	// 把前端的工作分离出start();
 	public void adjustStyle(Stage primaryStage) {
 		BorderPane mainPane=new BorderPane();//BorderPane，默认就分割好了上下左右中的五个部分
@@ -123,35 +201,33 @@ public class FangTclient extends Application implements FangTangConstants{
 		String pwd= password.getText().trim();// remove the space
 		@Override
 		public void handle(ActionEvent event) {
-			try {
-			//tcpClient是本程序定义的一个TCPClient类型的成员变量
-			tcpClient = new TCPClient("localhost", String.valueOf(port));
-			//用于接收服务器信息的单独线程
-			readThread = new Thread(()->{
-				String receiveMsg = null;//从服务器接收一串字符
-				while ((receiveMsg = tcpClient.receive()) != null){
-					//lambda表达式不能直接访问外部非final类型局部变量，需要定义一个临时变量,若将receiveMsg定义为类成员变量，则无需临时变量
-					String msgTemp = receiveMsg;
-					Platform.runLater(()->{// 稍后更新GUI
-						LocalDateTime now = LocalDateTime.now();
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
-						taDisplay.appendText(dtf.format(now)+"\n");// format print
-						taDisplay.setStyle("-fx-text-fill:black");
-						taDisplay.appendText(msgTemp+"\n");
-					
-					});
-				}
-				Platform.runLater(()->{
-					taDisplay.appendText("对话已关闭！\n");
-				});
-			});
-				readThread.start();			
-				btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
-				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
-				btnSend.setDisable(false);
-			}catch (Exception e){
-				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
-			}
+//			try {
+//			//用于接收服务器信息的单独线程
+//			readThread = new Thread(()->{
+//				String receiveMsg = null;//从服务器接收一串字符
+//				while ((receiveMsg = tcpClient.receive()) != null){
+//					//lambda表达式不能直接访问外部非final类型局部变量，需要定义一个临时变量,若将receiveMsg定义为类成员变量，则无需临时变量
+//					String msgTemp = receiveMsg;
+//					Platform.runLater(()->{// 稍后更新GUI
+//						LocalDateTime now = LocalDateTime.now();
+//						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+//						taDisplay.appendText(dtf.format(now)+"\n");// format print
+//						taDisplay.setStyle("-fx-text-fill:black");
+//						taDisplay.appendText(msgTemp+"\n");
+//					
+//					});
+//				}
+//				Platform.runLater(()->{
+//					taDisplay.appendText("对话已关闭！\n");
+//				});
+//			});
+//				readThread.start();			
+//				btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
+//				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
+//				btnSend.setDisable(false);
+//			}catch (Exception e){
+//				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
+//			}
 		}
 	}
 	
@@ -159,6 +235,9 @@ public class FangTclient extends Application implements FangTangConstants{
 		@Override
 		public void handle(ActionEvent event) {
 			String msg = tfSend.getText();
+			//修改一些变量. 
+			waiting = false; // 打断waiting 的状态.
+			
 			try {
 				tcpClient.send(msg);
 			} catch (IOException e) {

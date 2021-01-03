@@ -11,7 +11,6 @@ public class FtServer implements FangTangConstants{
 	private ConcurrentHashMap<Socket, String> users = new ConcurrentHashMap<Socket, String>();//save user name and socket
 	String localName = null;
 	String hostName;
-	private DataInputStream fromClient;  
 	private int clientNo = 0;//number a client
 	boolean flag = false ; // in the method init flag will occur error 匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
 	public static void main(String[] args){
@@ -50,9 +49,9 @@ public class FtServer implements FangTangConstants{
 			System.out.println("New connection accept:" + socket.getInetAddress());
 			try { 
 				//BufferedReader br = getReader(socket);//也可以用InputStream 输入流
-				fromClient = new DataInputStream(socket.getInputStream());
-				OutputStream outstream = socket.getOutputStream();//通过socket
-				DataOutputStream dout = new DataOutputStream(outstream);
+				DataInputStream fromClient = new DataInputStream(socket.getInputStream());
+				//通过socket
+				DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
 //				PrintWriter pw = new PrintWriter(outstream,true);//auto flush
 				dout.writeUTF("From 服务器：欢迎使用服务！\n 请输入用户名：");
 				//remind user to input user name

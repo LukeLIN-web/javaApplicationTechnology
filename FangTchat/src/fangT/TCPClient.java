@@ -14,11 +14,7 @@ public class TCPClient implements FangTangConstants{
 		public TCPClient(String ip, String port) throws IOException{
 			//主动向服务器发起连接，实现TCP三次握手, 不成功则抛出错误，由调用者处理错误
 			socket = new Socket(ip,Integer.parseInt(port));
-			//得到网络流输出字节流地址，并封装成网络输出字符流
-			toServer = new DataOutputStream(socket.getOutputStream());
-			//pw = new PrintWriter(new OutputStreamWriter(socketOut,"utf-8"),true);//参数true表示自动flush数据
-			//br = new BufferedReader(new InputStreamReader(socketIn,"utf-8"));
-			fromServer = new DataInputStream(socket.getInputStream());
+	
 		}
 	
 		//定义一个数据的发送方法
