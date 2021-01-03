@@ -54,18 +54,17 @@ public class FangTclient extends Application implements FangTangConstants{
 		btnExit.setOnAction(event -> {
 			try {
 				exit();
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-			}
+			} 
 		});
-		
 	//窗体关闭响应的事件,点击右上角的×关闭,客户端也关闭
 		primaryStage.setOnCloseRequest(event -> {
 			try {
 				exit();
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-			}
+			} 
 		});
 	}
 	// 把前端的工作分离出start();
@@ -160,7 +159,12 @@ public class FangTclient extends Application implements FangTangConstants{
 		@Override
 		public void handle(ActionEvent event) {
 			String msg = tfSend.getText();
-			tcpClient.send(msg);//向服务器发送一串字符 用户名和密码
+			try {
+				tcpClient.send(msg);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}//向服务器发送一串字符 用户名和密码
 			taDisplay.appendText("客户端发送："+msg+"\n");
 			if (msg.equalsIgnoreCase("bye")){ //业务逻辑写在里面, 比较冗长.
 				btnSend.setDisable(true);//发送bye后禁用发送按钮
@@ -176,7 +180,12 @@ public class FangTclient extends Application implements FangTangConstants{
 		public void handle(KeyEvent event) {
 			if(event.getCode()==KeyCode.ENTER){ //或许可以把他改成
 				String msg=tfSend.getText();
-				tcpClient.send(msg);//向服务器发送一串字符
+				try {
+					tcpClient.send(msg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}//向服务器发送一串字符
 				taDisplay.appendText("客户端发送："+msg+"\n");
 				
 				if (msg.equalsIgnoreCase("bye")){ //业务逻辑应该分离出来, 不应该在键盘事件中. 服务器发送一个禁用给你, 然后你的禁用.
@@ -189,7 +198,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			}
 		}
 	}
-	private void exit() throws InterruptedException {
+	private void exit() throws InterruptedException, IOException {
 		if (tcpClient!=null){
 			tcpClient.send("bye");
 			Thread.sleep(1000);//多线程等待，关闭窗口时还有线程等待IO，设置1s间隔保证所有线程已关闭

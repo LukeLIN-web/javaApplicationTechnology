@@ -53,7 +53,7 @@ public class FtServer implements FangTangConstants{
 				fromClient = new DataInputStream(socket.getInputStream());
 				OutputStream outstream = socket.getOutputStream();//通过socket
 				DataOutputStream dout = new DataOutputStream(outstream);
-				PrintWriter pw = new PrintWriter(outstream,true);//auto flush
+//				PrintWriter pw = new PrintWriter(outstream,true);//auto flush
 				dout.writeUTF("From 服务器：欢迎使用服务！\n 请输入用户名：");
 				//remind user to input user name
 				while ((hostName = fromClient.readUTF()) != null){
@@ -147,7 +147,7 @@ public class FtServer implements FangTangConstants{
 								}
 							}
 						}
-						default: pw.print("please input ");
+						default: dout.writeUTF("please input ");
 					}
 					dout.writeUTF("From 服务器：" + msg);
 					dout.writeUTF("来自服务器,重复消息："+msg);
