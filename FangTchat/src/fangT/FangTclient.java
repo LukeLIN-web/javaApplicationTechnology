@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -39,13 +38,13 @@ public class FangTclient extends Application implements FangTangConstants{
 	private Button btConn=new Button("连接");
 	private Button btLog=new Button("登录");
 	private Button btRegst=new Button("注册");
-	private TCPClient tcpClient;
-	private Thread readThread;
+	//private Thread readThread;
 	private DataInputStream fromServer;
 	private DataOutputStream toServer;
 	public  boolean continueToSend = true;
 	public  boolean waiting = true;
 	private String msg = "try a massge";
+	private Socket socket;
 	public static void main(String[] args) {
 		launch(args);//用来启动整个Application的
 	}
@@ -56,8 +55,8 @@ public class FangTclient extends Application implements FangTangConstants{
 	// btConn.defaultButtonProperty();
 		btConn.setOnAction(new BtnConnHandler() );
 		btnSend.setOnAction(new BtnSendHandler() );
-		tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
-		btRegst.setOnAction(new BtnRegstHandler());
+	//	tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
+	//	btRegst.setOnAction(new BtnRegstHandler());
 		btnExit.setOnAction(event -> {
 			try {
 				exit();
@@ -77,9 +76,10 @@ public class FangTclient extends Application implements FangTangConstants{
 	}
 	private void connectToserver() {
 		try {
-			Socket socket = new Socket("localhost",port);
+			socket = new Socket("localhost",port);
 			toServer = new DataOutputStream(socket.getOutputStream());
 			fromServer = new DataInputStream(socket.getInputStream());
+			System.out.println("连接成功！！ ");
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -87,12 +87,13 @@ public class FangTclient extends Application implements FangTangConstants{
 		new Thread( () ->{
 			try {
 				int logstatus = fromServer.readInt();//服务器告诉他可以开始了
+				System.out.println(logstatus+"接收到 登录状态");
 				if (logstatus == CONNECTSUCCESS) {
 					Platform.runLater( ()->{
 						taDisplay.appendText("	连接成功!!! \n");
 					});
-					
-					// todo: 可以开始.
+					btnSend.setDisable(false);
+					// todo: 可以开始. 做一些设置。
 				} else if (logstatus == CONNECTFAIL) {
 					Platform.runLater( ()->{
 						taDisplay.appendText("	连接失败!!! \n");
@@ -101,7 +102,7 @@ public class FangTclient extends Application implements FangTangConstants{
 				}
 				while(continueToSend) {
 					waitForSendAction();
-					sendMessage();
+					//sendMessage();//send 信息放在按钮事件中
 					receiveInfoFromServer();
 				}
 			} catch (Exception e) {
@@ -123,7 +124,6 @@ public class FangTclient extends Application implements FangTangConstants{
 	}
 	private void receiveInfoFromServer() throws IOException{
 		int currentStatus = fromServer.readInt();
-		
 		if (currentStatus == STOPSEND) {
 			continueToSend = false;
 			Platform.runLater( ()->{
@@ -131,19 +131,19 @@ public class FangTclient extends Application implements FangTangConstants{
 			});
 		}
 		else if(currentStatus == CONTINUESEND){ // 约定好, 先发CONTINUESEND,然后再发字符串.
-			reveiveMsg();//把接收和事件分离开, 而不是在这里readutf
+			//reveiveMsg();//把接收和事件分离开, 而不是在这里readutf
 			Platform.runLater( ()->{
 				taDisplay.appendText("可以继续发送");
 			});
 		}
 	}
 	
-	private void reveiveMsg() throws IOException{
-		String tmp = fromServer.readUTF();
-		Platform.runLater( ()->{
-			taDisplay.appendText(tmp);
-		});
-	}
+//	private void reveiveMsg() throws IOException{
+//		String tmp = fromServer.readUTF();
+//		Platform.runLater( ()->{
+//			taDisplay.appendText(tmp);
+//		});
+//	}
 	
 	// 把前端的工作分离出start();
 	public void adjustStyle(Stage primaryStage) {
@@ -179,55 +179,58 @@ public class FangTclient extends Application implements FangTangConstants{
 		
 	}
 	// 按下注册按钮, 户端发送用户密码到服务器, 服务器去数据库找是否对应,如果有,那就显示已存在用户名,  如果不对应,那就add 这个. 显示注册成功. 
-	class BtnRegstHandler implements EventHandler<ActionEvent>{
-		String usr = username.getText().trim();
-		String pwd= password.getText().trim();// remove the space
-		@Override
-		public void handle(ActionEvent event) {
-			try {
-				tcpClient.objSend(usr,pwd,2);//注册, id =2 , name 
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			taDisplay.appendText("注册中\n");
-			username.clear();
-			password.clear();
-		}
-	}
+//	class BtnRegstHandler implements EventHandler<ActionEvent>{
+//		String usr = username.getText().trim();
+//		String pwd= password.getText().trim();// remove the space
+//		@Override
+//		public void handle(ActionEvent event) {
+//			try {
+//			//	tcpClient.objSend(usr,pwd,2);//注册, id =2 , name 
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			taDisplay.appendText("注册中\n");
+//			username.clear();
+//			password.clear();
+//		}
+//	}
 	
 	class BtnConnHandler implements EventHandler<ActionEvent>{ //连接按钮触发的事件原先用lambda函数表示 , now 改写为单独的类
 		String usr = username.getText().trim();
 		String pwd= password.getText().trim();// remove the space
 		@Override
 		public void handle(ActionEvent event) {
-//			try {
-//			//用于接收服务器信息的单独线程
+			waiting = false;
+			try {
+				toServer.writeInt(LOGIN);
+				toServer.writeUTF(usr);
+				toServer.writeUTF(pwd);
+			//用于接收服务器信息的单独线程
 //			readThread = new Thread(()->{
 //				String receiveMsg = null;//从服务器接收一串字符
 //				while ((receiveMsg = tcpClient.receive()) != null){
 //					//lambda表达式不能直接访问外部非final类型局部变量，需要定义一个临时变量,若将receiveMsg定义为类成员变量，则无需临时变量
 //					String msgTemp = receiveMsg;
-//					Platform.runLater(()->{// 稍后更新GUI
-//						LocalDateTime now = LocalDateTime.now();
-//						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
-//						taDisplay.appendText(dtf.format(now)+"\n");// format print
-//						taDisplay.setStyle("-fx-text-fill:black");
-//						taDisplay.appendText(msgTemp+"\n");
-//					
-//					});
+					Platform.runLater(()->{// 稍后更新GUI
+						LocalDateTime now = LocalDateTime.now();
+						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+						taDisplay.appendText(dtf.format(now)+"\n");// format print
+						taDisplay.setStyle("-fx-text-fill:black");
+						taDisplay.appendText("\n");
+					});
 //				}
-//				Platform.runLater(()->{
-//					taDisplay.appendText("对话已关闭！\n");
-//				});
+				Platform.runLater(()->{
+					taDisplay.appendText("用户名和密码以发送！\n");
+				});
 //			});
 //				readThread.start();			
 //				btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
 //				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
 //				btnSend.setDisable(false);
-//			}catch (Exception e){
-//				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
-//			}
+			}catch (Exception e){
+				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
+			}
 		}
 	}
 	
@@ -236,10 +239,9 @@ public class FangTclient extends Application implements FangTangConstants{
 		public void handle(ActionEvent event) {
 			String msg = tfSend.getText();
 			//修改一些变量. 
-			waiting = false; // 打断waiting 的状态.
-			
+			waiting = false; // 打断waiting 的状态. 结束waitForSendAction()
 			try {
-				tcpClient.send(msg);
+				toServer.writeBytes(msg);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -254,35 +256,44 @@ public class FangTclient extends Application implements FangTangConstants{
 			tfSend.clear();
 		}
 	}
-	class PressSendHandler implements EventHandler<KeyEvent>{
-		@Override
-		public void handle(KeyEvent event) {
-			if(event.getCode()==KeyCode.ENTER){ //或许可以把他改成
-				String msg=tfSend.getText();
-				try {
-					tcpClient.send(msg);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}//向服务器发送一串字符
-				taDisplay.appendText("客户端发送："+msg+"\n");
-				
-				if (msg.equalsIgnoreCase("bye")){ //业务逻辑应该分离出来, 不应该在键盘事件中. 服务器发送一个禁用给你, 然后你的禁用.
-					tfSend.setDisable(true);//禁用Enter发送信息输入区域, 
-					btnSend.setDisable(true);//发送bye后禁用发送按钮
-					//结束服务后再次启用连接按钮
-					btConn.setDisable(false);// 两个bye的代码, 这好愚蠢, 我可不可以把msg抽象出来, 只要发送了bye, 那就禁用.
-				}
-				tfSend.clear();
-			}
-		}
-	}
+//	class PressSendHandler implements EventHandler<KeyEvent>{
+//		@Override
+//		public void handle(KeyEvent event) {
+//			if(event.getCode()==KeyCode.ENTER){ //或许可以把他改成
+//				String msg = tfSend.getText();
+//				try {
+//					toServer.writeInt( );
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}//向服务器发送一串字符
+//				taDisplay.appendText("客户端发送："+msg+"\n");
+//				
+//				if (msg.equalsIgnoreCase("bye")){ //业务逻辑应该分离出来, 不应该在键盘事件中. 服务器发送一个禁用给你, 然后你的禁用.
+//					tfSend.setDisable(true);//禁用Enter发送信息输入区域, 
+//					btnSend.setDisable(true);//发送bye后禁用发送按钮
+//					//结束服务后再次启用连接按钮
+//					btConn.setDisable(false);// 两个bye的代码, 这好愚蠢, 我可不可以把msg抽象出来, 只要发送了bye, 那就禁用.
+//				}
+//				tfSend.clear();
+//			}
+//		}
+//	}
 	private void exit() throws InterruptedException, IOException {
-		if (tcpClient!=null){
-			tcpClient.send("bye");
+//		if (tcpClient!=null){
+//			tcpClient.send("bye");
 			Thread.sleep(1000);//多线程等待，关闭窗口时还有线程等待IO，设置1s间隔保证所有线程已关闭
-			tcpClient.close();
-		}
+			close();
+//		}
 		System.exit(0);
+	}
+	
+	public void close(){
+	if (socket != null)
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

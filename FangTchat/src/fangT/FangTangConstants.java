@@ -1,8 +1,5 @@
 package fangT;
 import java.lang.String;
-
-import org.w3c.dom.NameList;
-
 import java.io.Serializable;
 
 // 定义了程序中所有类共享的常量.
@@ -11,7 +8,10 @@ public interface FangTangConstants {
 	public static int CONNECTSUCCESS = 11;
 	public static int CONNECTFAIL = 22;
 	public static int STOPSEND =33;
-	public static int  CONTINUESEND = 44;
+	public static int CONTINUESEND = 44;
+	public static int LOGIN = 55;
+	public static int REGISTER = 66;
+	
 	class logrequest implements Serializable{
 		/**
 		 * 列化操作的时候系统会把当前类的serialVersionUID写入到序列化文件中，当反序列化时系统会去检测文件中的serialVersionUID，判断它是否与当前类的serialVersionUID一致，
