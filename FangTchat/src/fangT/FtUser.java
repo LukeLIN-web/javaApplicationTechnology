@@ -96,17 +96,48 @@ public class FtUser {
 		}
     }
     // user can search all user name from id 
-    public int getAllName() {
+    public int getAllName(int ftid) {
    		String sql = "select name from ft_user";
    		try {
-   			 Connection conn = DriverManager.getConnection(url,username,password);
-   			 s = conn.createStatement();
-   			 rs = s.executeQuery(sql);
-   			 System.out.print(" query success!"+rs);
+   			Connection conn = DriverManager.getConnection(url,username,password);
+   			s = conn.createStatement();
+   			rs = s.executeQuery(sql);
+   			System.out.print(" query success!"+rs);
    		} catch (SQLException e) { 
    		e.printStackTrace();
    		}
         return id;
+    }
+    
+    public String getPassword(int ftid) throws SQLException  {
+   		String sql = "select name from ft_user WHERE ftid = ? ";
+   		try {
+   			Connection conn = DriverManager.getConnection(url,username,password);
+   			preSt = conn.prepareStatement(sql);
+   			preSt.setInt(1, ftid);
+   			rs = preSt.executeQuery();
+   			 System.out.print(" query success!"+rs);
+   		} catch (SQLException e) { 
+   		e.printStackTrace();
+   		}
+        return rs.getString(2);
+    }
+    
+    public int getNewestId() {
+		String findIdsql = "select max(ftid) from ft_user";
+		 int tmp = 0;
+		try {
+			Connection conn = DriverManager.getConnection(url,username,password);
+   			s  = conn.createStatement();
+   			rs = s.executeQuery(findIdsql);
+   			while (rs.next()) {
+   				tmp = rs.getInt(1);
+			}
+			System.out.println("id:"+tmp);
+		} catch (SQLException e) { 
+		e.printStackTrace();
+		}
+        return tmp;
     }
     
     public String getUserName() {
@@ -155,7 +186,7 @@ public class FtUser {
 		}
     }
   
-    public int add(String name,String pwd ) {
+    public void add(String name,String pwd ) {
 		String sql = "insert into ft_user(name,password) values( ?  , ?)";//insert into ft_user(name,password) values( 'user1', '123');
 		System.out.print(sql);
 		try {
@@ -170,18 +201,14 @@ public class FtUser {
 			System.out.print("id =  "+String.valueOf(id)+"name  = " +name+"passwrod = "+pwd);//在服务器端输出密码没关系,只要不发送给客户端
 			preSt.setString(2, pwd);// 你可以通过把pwd改成password来统一设置密码为111111
 			 System.out.print(" user add success!"+preSt.executeUpdate()); // 要给一个信息给前端显示,在messagebox
+			 rs = preSt.getGeneratedKeys(); 
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
-		String findIdsql = "select max(ftid) from ft_user";
-   		try {
-   			 rs = s.executeQuery(findIdsql);
-   			 System.out.print(" find id!"+rs);
-   		} catch (SQLException e) { 
-   		e.printStackTrace();
-   		}
-        return id;
-	}
+   	 	System.out.print(" find id!"+rs);
+   	}
+    
+    
     @Override
     public String toString() {
         return "ft_user{" +
@@ -193,22 +220,27 @@ public class FtUser {
     
     public static void main(String[] args) {
 		 	FtUser p = new FtUser();
-		    //int id2 = p.add("user3","pass2");//注册, 已完成
+		 	int id2 = 0 ;
+//		    try {
+//				id2 = p.add("user4","123");
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}//注册, 已完成
 		    boolean flag = false;
-		   
-			for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) {
-				 String tmpname = ite.next().name;
-		        if (tmpname.equals("user100") ) {
-					flag = true;//如果有一样的,  那就报告重复, 通知
-				}
-				System.out.println(tmpname);
-		    }
+//			for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) {
+//				 String tmpname = ite.next().getUserName();
+//		        if (tmpname.equals("user10") ) {
+//					flag = true;//如果有一样的,  那就报告重复, 通知
+//				}
+//				System.out.println(tmpname);
+//		    }
 		 	//p.setPassword(102, "pass101");//修改密码, 已完成
 		 	//p.setName(1, "usertry");// 修改名字, 已完成
 			//p.delete(603);// 通过ftid 删除已完成
 		 	//System.out.println(p.vt); // show all line in the table
 		    System.out.println(" finished");
-		    //System.out.println(id2);
+		    System.out.println(p.getNewestId());
 		    System.out.println(flag);
 		}
 }

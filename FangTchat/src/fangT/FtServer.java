@@ -52,13 +52,16 @@ public class FtServer implements FangTangConstants{
 		}
 		public void responseRgstr(String usr,String pwd) throws IOException {
 			boolean flag = false;
-			for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();ite.next()) {
-		        if (ite.getClass().getName().equals(usr) ) {
+			for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();) {
+				 String tmpname = ite.next().getUserName();
+		        if (tmpname.equals(usr) ) {
 					flag = true;//如果有一样的,  那就报告重复, 通知
 				}
+				System.out.println(tmpname);
 		    }
 			if(flag == false) {
-				int id = ftuser.add(usr, pwd);//如果没有一样的,那就注册一个
+				ftuser.add(usr, pwd);//如果没有一样的,那就注册一个
+				int id = ftuser.getNewestId();
 				toClient.writeUTF("没有用户名, 注册了一个账户, 用户名为 =    "+usr+"账号为 "+id + " 请牢记! 服务器收到的用户名为 =    "+usr);
 			}
 			else {
