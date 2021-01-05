@@ -173,3 +173,15 @@ public static void main(String[] args) {
 （1）三分钟理解Java中字符串（String）的存储和赋值原理 http://blog.csdn.net/zhuiwenwen/article/details/12351565
 
 （2）Java之内存分析和String对象 http://www.cnblogs.com/devinzhang/archive/2012/01/25/2329463.html
+
+
+
+### 遍历vector
+
+```java
+for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();ite.next()) {
+	        if (ite.getClass().getName().equals(usr) ) {
+				
+			}
+	    }
+```

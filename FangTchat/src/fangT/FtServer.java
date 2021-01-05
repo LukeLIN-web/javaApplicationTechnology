@@ -14,6 +14,7 @@ public class FtServer implements FangTangConstants{
 	private int clientNo = 0;//number a client
 	DataInputStream fromClient;
 	DataOutputStream toClient ;
+	FtUser ftuser = new FtUser();
 	boolean flag = false ; // in the method init flag will occur error 匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
 	public static void main(String[] args){
 			try {
@@ -50,7 +51,19 @@ public class FtServer implements FangTangConstants{
 			toClient.writeUTF("服务器收到的用户名和密码为  =    "+usr+pwd);
 		}
 		public void responseRgstr(String usr,String pwd) throws IOException {
-			toClient.writeUTF("服务器收到的用户名和密码为 =    "+usr+pwd);
+			boolean flag = false;
+			for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();ite.next()) {
+		        if (ite.getClass().getName().equals(usr) ) {
+					flag = true;//如果有一样的,  那就报告重复, 通知
+				}
+		    }
+			if(flag == false) {
+				ftuser.add(usr, pwd);//如果没有一样的,那就注册一个
+				toClient.writeUTF("没有用户名, 注册了一个账户, 用户名为 =    "+usr+"服务器收到的用户名为 =    "+usr);
+			}
+			else {
+				toClient.writeUTF("用户名"+usr+"已经存在, 请重新输入用户名和密码,再次点击注册按钮!  ");
+			}
 		}
 		
 		public void run() {//本地服务器控制台显示客户端连接的用户信息

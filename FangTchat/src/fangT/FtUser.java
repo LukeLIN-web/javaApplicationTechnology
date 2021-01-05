@@ -95,7 +95,7 @@ public class FtUser {
 		}
     }
     // user can search all user name from id 
-    public int getName() {
+    public int getAllName() {
    		String sql = "select name from ft_user";
    		try {
    			 Connection conn = DriverManager.getConnection(url,username,password);
@@ -107,6 +107,11 @@ public class FtUser {
    		}
         return id;
     }
+    
+    public String getName() {
+    	return this.name;
+    }
+    
 
     // password 不能change 12.31 16:06 为什么呢?
     public void setPassword(int ftid,String pwd) {
@@ -114,7 +119,7 @@ public class FtUser {
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
-			 preSt = conn.prepareStatement(sql);
+			preSt = conn.prepareStatement(sql);
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
@@ -128,9 +133,7 @@ public class FtUser {
 		e.printStackTrace();
 		}
     }
-
-  
-
+    
     public void setName(int id,String name) {
 		String sql = "update ft_user set name = ? where ftid = ?";//insert into ft_user values(2,'wangqiang' ,12,'Beijingwang');
 		System.out.print(sql);
@@ -162,7 +165,7 @@ public class FtUser {
 		}
 		try {
 			preSt.setString(1, name);
-			System.out.print("id =  "+String.valueOf(id)+"name  = " +name);
+			System.out.print("id =  "+String.valueOf(id)+"name  = " +name+"passwrod = "+pwd);//在服务器端输出密码没关系,只要不发送给客户端
 			preSt.setString(2, pwd);// 你可以通过把pwd改成password来统一设置密码为111111
 			 System.out.print(" user add success!"+preSt.executeUpdate()); // 要给一个信息给前端显示,在messagebox
 		} catch (SQLException e) { 

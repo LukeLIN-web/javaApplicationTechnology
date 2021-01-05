@@ -35,7 +35,9 @@ public class FangTclient extends Application implements FangTangConstants{
 	private TextField tfSend=new TextField();//输入信息区域
 	private TextArea taDisplay = new TextArea();//显示区域
 	private TextField username = new TextField();//填写用户名
-	private PasswordField password = new PasswordField();//填写密码
+	private PasswordField LOGINpassword = new PasswordField();
+	private TextField fangTangId = new TextField();//填写id
+	private PasswordField REGIpassword = new PasswordField();//填写密码
 	private Button btConn = new Button("登录");
 	private Button btRegst = new Button("注册");
 	private DataInputStream fromServer;
@@ -134,14 +136,26 @@ public class FangTclient extends Application implements FangTangConstants{
 		hBox1.setSpacing(10);
 		hBox1.setPadding(new Insets(10,20,10,20));//setPadding()：以外部控件的角度，规定其内部控件与其的距离
 		hBox1.setAlignment(Pos.CENTER);
-		hBox1.getChildren().addAll(new Label("用户名："),username,new Label("密码："),password,btConn,btRegst);// 从左到右horizon
-		mainPane.setTop(hBox1);// 放上方
+		hBox1.getChildren().addAll(new Label("账号:"),fangTangId,new Label("密码："),LOGINpassword,btConn);// 从左到右horizon
+		
+		
+		HBox hBox2 = new HBox();
+		hBox2.setSpacing(10);
+		hBox2.setPadding(new Insets(10,20,10,20));//setPadding()：以外部控件的角度，规定其内部控件与其的距离
+		hBox2.setAlignment(Pos.CENTER);
+		hBox2.getChildren().addAll(new Label("昵称:"),username,new Label("密码："),REGIpassword,btRegst);// 从左到右horizon
+		
+		VBox vBox1 = new VBox();//vertical box 
+		vBox1.setSpacing(10); //设置单行面板组件的间距为10像素
+		vBox1.setPadding(new Insets(10,20,10,20));
+		vBox1.getChildren().addAll(hBox1,hBox2);
+		mainPane.setTop(vBox1);// 放上方
 		
 		VBox vBox = new VBox();//vertical box 
 		vBox.setSpacing(10); //设置单行面板组件的间距为10像素
 		vBox.setPadding(new Insets(10,20,10,20));
 		vBox.getChildren().addAll(new javafx.scene.control.Label("信息显示区"),taDisplay,new Label("信息输入区"),tfSend);
-		VBox.setVgrow(taDisplay, Priority.ALWAYS);
+		VBox.setVgrow(taDisplay, Priority.ALWAYS);//Priority，一个枚举类,用于确定给定节点的增长（或缩小）优先级。比如:一个HBox布局，里面有三个控件，当屏幕宽度是800时，刚好把屏幕占满，但是当屏幕扩大到1200时，这个Priority规定了这三个控件如何处理增加的400宽度。共有三个取值：ALWAYS：布局区域将始终尝试增长（或缩小），共享那些空间;
 		mainPane.setCenter(vBox);
 		
 		HBox hBox = new HBox();
