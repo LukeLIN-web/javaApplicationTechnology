@@ -15,9 +15,10 @@ import java.io.File;
 	import java.sql.*;
 	
 	/*
-	 * automatically generated class 12.17-12.20, 
-	 * manual: you just change the var table, it will  generate the .class and .java from the database . 
-	 * you can use 
+	 * automatically generated class,  
+	 *  building time: 2020.12.17-12.20, 
+	 * manual: you just change the string variable "table", it will  generate the .class and .java from the database . 
+	 * then  you can use in your program. 
 	 */
 	/*java 动态编译。将文本写到文件，用Java的类加载动态运行。
 	 * 1.使用jdk自带rt.jar中的javax.tools包提供的编译器（也可以用runtime运行cmd）进行编译java源文件。
@@ -223,7 +224,7 @@ public class  AutoBuildjavarun {
 
 	//常量
 interface Constants{
-	    String BASEDIR=".\\AutoBuildClassRoot";
-	    String SUFFIX=".class";
+	    String BASEDIR=".\\AutoBuildClassRoot";// project当前目录下的文件夹.
+	    String SUFFIX=".class";//后缀
 }
 

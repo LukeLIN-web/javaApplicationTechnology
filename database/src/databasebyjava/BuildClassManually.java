@@ -1,6 +1,6 @@
 package databasebyjava;
 
-//it may use for test automatically generated class. 12.20
+//it use for test automatically generated class. 2020.12.20
 public class BuildClassManually {
 	
 	public static void main(String[] args) {

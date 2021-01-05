@@ -12,6 +12,8 @@ public class FtServer implements FangTangConstants{
 	String localName = null;
 	String hostName;
 	private int clientNo = 0;//number a client
+	DataInputStream fromClient;
+	DataOutputStream toClient ;
 	boolean flag = false ; // in the method init flag will occur error 匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
 	public static void main(String[] args){
 			try {
@@ -44,25 +46,36 @@ public class FtServer implements FangTangConstants{
 				}
 			return leave;
 		}
+		public void responseLogin(String usr,String pwd) throws IOException {
+			toClient.writeUTF("服务器收到的用户名和密码为  =    "+usr+pwd);
+		}
+		public void responseRgstr(String usr,String pwd) throws IOException {
+			toClient.writeUTF("服务器收到的用户名和密码为 =    "+usr+pwd);
+		}
 		
 		public void run() {//本地服务器控制台显示客户端连接的用户信息
 			System.out.println("New connection accept:" + socket.getInetAddress());
 			try { 
-				DataInputStream fromClient = new DataInputStream(socket.getInputStream());
-				DataOutputStream toClient = new DataOutputStream(socket.getOutputStream());
+				fromClient = new DataInputStream(socket.getInputStream());
+				toClient = new DataOutputStream(socket.getOutputStream());
 				toClient.writeInt(CONNECTSUCCESS);//给他一个信号,可以开始了。对应int logstatus = fromServer.readInt()
-				System.out.println("发送信号 可以开始");// 应该要先开启服务器再开启客户端否则会连接不上。因为客户端开启就直接建立连接了。
+				System.out.println("发送CONNECTSUCCESS信号 可以开始");// 应该要先开启服务器再开启客户端否则会连接不上。因为客户端开启就直接建立连接了。
 				while (true) {
 					int signal = fromClient.readInt();// 信号是登录呢？ 还是信息呢？ 还是注册呢？还是退出呢？
-					if(signal == LOGIN) {
+					if(signal == LOGIN || signal == REGISTER) {
+						System.out.println("	接收用户名和密码中.... ");
 						String username = fromClient.readUTF();
 						String password = fromClient.readUTF();
+						System.out.println("收到的用户名和密码为 = "+username+password);
 						toClient.writeInt( CONTINUESEND);
+						if(signal == LOGIN)
+							responseLogin(username,password);
+						else {
+							responseRgstr(username,password);
+						}
 					}
-					
 				}
-//				//dout.writeUTF("From 服务器：欢迎使用服务！\n 请输入用户名：");
-//				//remind user to input user name
+
 ////				while ((hostName = fromClient.readUTF()) != null){
 ////					users.forEach((k,v)->{
 ////					if (v.equals(hostName))
@@ -186,19 +199,6 @@ public class FtServer implements FangTangConstants{
 		}
 	}
 
-//	private PrintWriter getWriter(Socket socket) throws IOException{
-//		//获得输出流缓冲区的地址
-//		OutputStream socketOut = socket.getOutputStream();
-//		//网络流写出需要使用flush，这里在printWriter构造方法直接设置为自动flush
-//		return new PrintWriter(new OutputStreamWriter(socketOut,"utf-8"),true);
-//	}
-
-//	private BufferedReader getReader(Socket socket) throws IOException{
-//		//获得输入流缓冲区的地址
-//		InputStream socketIn = socket.getInputStream();
-//		return new BufferedReader(new InputStreamReader(socketIn,"utf-8"));
-//	}
-
 	// send to all users save socket in hash map
 	private void sendToMembers(String msg,String hostAddress,Socket mySocket) throws IOException{
 
@@ -219,7 +219,6 @@ public class FtServer implements FangTangConstants{
 	// send to specific socket
 	private void sendToOne(String msg,String hostAddress,Socket another) throws IOException{
 		OutputStream out;
-		
 		Iterator iterator=users.entrySet().iterator();
 		while (iterator.hasNext()){
 			Map.Entry entry=(Map.Entry) iterator.next();

@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="ipAddress"/>
+		<item key="selection" value="tcpClient"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="true"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="ipAddress"/>
-			<item value="port"/>
-			<item value="退出"/>
-			<item value="服务器"/>
-			<item value="close"/>
-			<item value="now"/>
-			<item value="accept"/>
-			<item value="Main"/>
-			<item value="preSt"/>
-			<item value="\\r"/>
-			<item value="\\n"/>
-			<item value="getBaseFileName"/>
-			<item value="findClass"/>
-			<item value="pres"/>
-			<item value="”"/>
+			<item value="tcpClient"/>
+			<item value="服务器连接失败！"/>
+			<item value="run"/>
+			<item value="handle"/>
+			<item value="launch"/>
+			<item value="receive"/>
+			<item value="pwd"/>
+			<item value="socket"/>
+			<item value="send"/>
+			<item value="read()"/>
+			<item value="serverSocket"/>
+			<item value="accept()"/>
+			<item value="pw.println"/>
+			<item value="utf"/>
+			<item value="监听"/>
 		</list>
 		<list key="replacehistory">
+			<item value="dout.writeUTF"/>
+			<item value="ft_user"/>
 			<item value=""/>
 			<item value="\n"/>
 			<item value="&quot;"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1747"/>
-		<item key="DIALOG_Y_ORIGIN" value="614"/>
+		<item key="DIALOG_X_ORIGIN" value="1267"/>
+		<item key="DIALOG_Y_ORIGIN" value="685"/>
 		<item key="DIALOG_WIDTH" value="405"/>
 		<item key="DIALOG_HEIGHT" value="534"/>
 		<item key="DIALOG_FONT_NAME" value="1|Microsoft YaHei UI|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|0|0|Microsoft YaHei UI"/>
