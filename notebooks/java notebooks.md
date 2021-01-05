@@ -179,9 +179,13 @@ public static void main(String[] args) {
 ### 遍历vector
 
 ```java
-for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();ite.next()) {
-	        if (ite.getClass().getName().equals(usr) ) {
-				
-			}
-	    }
+for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) 
+{
+	System.out.println(ite.next().name);
+    if (ite.getClass().getName().equals("user10") ) {
+					flag = true;//如果有一样的,  那就报告重复, 通知
+	}
+ }
 ```
+it.next()指向这个类, ite.next().name获得类中的变量
+

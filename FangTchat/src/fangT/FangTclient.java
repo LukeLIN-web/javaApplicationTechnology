@@ -178,7 +178,7 @@ public class FangTclient extends Application implements FangTangConstants{
 		public void handle(ActionEvent event) {
 			waiting = false;
 			String usr = username.getText().trim();// 这个必须放在handle或者event中, 否则只能获得默认值.
-			String pwd = password.getText().trim();// remove the space
+			String pwd = REGIpassword.getText().trim();// remove the space
 			try {
 				toServer.writeInt(REGISTER);//客户端发注册信号
 				toServer.writeUTF(usr);
@@ -197,7 +197,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			}
 			taDisplay.appendText("注册中\n");
 			username.clear();
-			password.clear();
+			REGIpassword.clear();
 		}
 	}
 	
@@ -205,12 +205,12 @@ public class FangTclient extends Application implements FangTangConstants{
 		@Override
 		public void handle(ActionEvent event) {
 			waiting = false;
-			String usr = username.getText().trim();// 这个必须放在handle或者event中, 否则只能获得默认值.
-			String pwd = password.getText().trim();// remove the space
-			System.out.println(usr + pwd + "jie\n");// debug 1.5.20:52
+			String ftid = fangTangId.getText().trim();// 这个必须放在handle或者event中, 否则只能获得默认值.
+			String pwd = LOGINpassword.getText().trim();// remove the space
+			System.out.println(ftid + pwd + "jie\n");// debug 1.5.20:52
 			try {
 				toServer.writeInt(LOGIN);
-				toServer.writeUTF(usr);
+				toServer.writeUTF(ftid);
 				toServer.writeUTF(pwd);
 					Platform.runLater(()->{// 稍后更新GUI
 						LocalDateTime now = LocalDateTime.now();
@@ -218,7 +218,7 @@ public class FangTclient extends Application implements FangTangConstants{
 						taDisplay.appendText(dtf.format(now)+"\n");// format print
 						taDisplay.setStyle("-fx-text-fill:black");
 						taDisplay.appendText("\n");
-						taDisplay.appendText(usr+pwd+"用户名和密码已经发送！\n");
+						taDisplay.appendText(ftid+pwd+"用户名和密码已经发送！\n");
 					});
 				//btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
 				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
@@ -226,8 +226,8 @@ public class FangTclient extends Application implements FangTangConstants{
 			}catch (Exception e){
 				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
 			}
-			username.clear();
-			password.clear();
+			fangTangId.clear();
+			LOGINpassword.clear();
 		}
 	}
 	

@@ -58,8 +58,8 @@ public class FtServer implements FangTangConstants{
 				}
 		    }
 			if(flag == false) {
-				ftuser.add(usr, pwd);//如果没有一样的,那就注册一个
-				toClient.writeUTF("没有用户名, 注册了一个账户, 用户名为 =    "+usr+"服务器收到的用户名为 =    "+usr);
+				int id = ftuser.add(usr, pwd);//如果没有一样的,那就注册一个
+				toClient.writeUTF("没有用户名, 注册了一个账户, 用户名为 =    "+usr+"账号为 "+id + " 请牢记! 服务器收到的用户名为 =    "+usr);
 			}
 			else {
 				toClient.writeUTF("用户名"+usr+"已经存在, 请重新输入用户名和密码,再次点击注册按钮!  ");

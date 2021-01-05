@@ -5,6 +5,7 @@ and log in name corresponding to password
 
 */
 import java.sql.*;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class FtUser {
@@ -108,7 +109,7 @@ public class FtUser {
         return id;
     }
     
-    public String getName() {
+    public String getUserName() {
     	return this.name;
     }
     
@@ -154,12 +155,13 @@ public class FtUser {
 		}
     }
   
-    public void add(String name,String pwd ) {
+    public int add(String name,String pwd ) {
 		String sql = "insert into ft_user(name,password) values( ?  , ?)";//insert into ft_user(name,password) values( 'user1', '123');
 		System.out.print(sql);
 		try {
 			Connection conn = DriverManager.getConnection(url,username,password);
 			 preSt = conn.prepareStatement(sql);
+			 s = conn.createStatement();
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
@@ -171,6 +173,14 @@ public class FtUser {
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
+		String findIdsql = "select max(ftid) from ft_user";
+   		try {
+   			 rs = s.executeQuery(findIdsql);
+   			 System.out.print(" find id!"+rs);
+   		} catch (SQLException e) { 
+   		e.printStackTrace();
+   		}
+        return id;
 	}
     @Override
     public String toString() {
@@ -183,11 +193,22 @@ public class FtUser {
     
     public static void main(String[] args) {
 		 	FtUser p = new FtUser();
-		    //p.add("user2","pass2");//注册, 已完成
+		    //int id2 = p.add("user3","pass2");//注册, 已完成
+		    boolean flag = false;
+		   
+			for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) {
+				 String tmpname = ite.next().name;
+		        if (tmpname.equals("user100") ) {
+					flag = true;//如果有一样的,  那就报告重复, 通知
+				}
+				System.out.println(tmpname);
+		    }
 		 	//p.setPassword(102, "pass101");//修改密码, 已完成
 		 	//p.setName(1, "usertry");// 修改名字, 已完成
-			//p.delete(2);// 通过ftid 删除已完成
-		 	System.out.println(p.vt); // show all line in the table
+			//p.delete(603);// 通过ftid 删除已完成
+		 	//System.out.println(p.vt); // show all line in the table
 		    System.out.println(" finished");
+		    //System.out.println(id2);
+		    System.out.println(flag);
 		}
 }
