@@ -2,6 +2,7 @@ package fangT;
 
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;//实现线程安全. 
 //import java.util.concurrent.ExecutorService;
@@ -47,8 +48,33 @@ public class FtServer implements FangTangConstants{
 				}
 			return leave;
 		}
-		public void responseLogin(String usr,String pwd) throws IOException {
-			toClient.writeUTF("服务器收到的用户名和密码为  =    "+usr+pwd);
+		public void responseLogin(int ftid,String pwd) throws IOException {
+			boolean flag = false;
+		    for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();) {
+		    	FtUser tmpft = ite.next();// we cannot use next() twice .
+				 int tmpid = tmpft.getFtid();
+		        if (tmpid == ftid ) {
+					try {
+						if (tmpft.getPassword(tmpid).equals(pwd)) {
+							flag = true;
+							System.out.println("	password =  "+ ftuser.getPassword(tmpid));
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+		    }
+			if(flag == false) {				//如果没有一样的,那就返回错误信息
+				toClient.writeUTF("服务器收到的id和密码为  =    "+ftid+pwd+"\n账号或密码错误! 请重新输入账号或密码,然后再次点击登录按钮!\n  ");	
+			}
+			else {
+				try {
+					toClient.writeUTF("登录成功!  username is "+ftuser.getName(ftid)+"  账号为 "+ftid);
+					// 登录状态为1; 
+				} catch (Exception e) {
+					e.printStackTrace();
+				} 
+			}
 		}
 		public void responseRgstr(String usr,String pwd) throws IOException {
 			boolean flag = false;
@@ -74,19 +100,25 @@ public class FtServer implements FangTangConstants{
 			try { 
 				fromClient = new DataInputStream(socket.getInputStream());
 				toClient = new DataOutputStream(socket.getOutputStream());
+				int ftid;	
+				String username;
+				String password;
 				toClient.writeInt(CONNECTSUCCESS);//给他一个信号,可以开始了。对应int logstatus = fromServer.readInt()
 				System.out.println("发送CONNECTSUCCESS信号 可以开始");// 应该要先开启服务器再开启客户端否则会连接不上。因为客户端开启就直接建立连接了。
 				while (true) {
 					int signal = fromClient.readInt();// 信号是登录呢？ 还是信息呢？ 还是注册呢？还是退出呢？
 					if(signal == LOGIN || signal == REGISTER) {
 						System.out.println("	接收用户名和密码中.... ");
-						String username = fromClient.readUTF();
-						String password = fromClient.readUTF();
-						System.out.println("收到的用户名和密码为 = "+username+password);
 						toClient.writeInt( CONTINUESEND);
-						if(signal == LOGIN)
-							responseLogin(username,password);
+						if(signal == LOGIN) {
+							ftid = fromClient.readInt();
+							password = fromClient.readUTF();
+							responseLogin(ftid,password);
+						}
 						else {
+							username = fromClient.readUTF();
+							password = fromClient.readUTF();
+							System.out.println("收到的用户名和密码为 = "+username+password);
 							responseRgstr(username,password);
 						}
 					}

@@ -210,7 +210,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			System.out.println(ftid + pwd + "jie\n");// debug 1.5.20:52
 			try {
 				toServer.writeInt(LOGIN);
-				toServer.writeUTF(ftid);
+				toServer.writeInt(Integer.parseInt(ftid));
 				toServer.writeUTF(pwd);
 					Platform.runLater(()->{// 稍后更新GUI
 						LocalDateTime now = LocalDateTime.now();

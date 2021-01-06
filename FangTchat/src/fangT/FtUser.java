@@ -110,17 +110,39 @@ public class FtUser {
     }
     
     public String getPassword(int ftid) throws SQLException  {
-   		String sql = "select name from ft_user WHERE ftid = ? ";
+   		String sql = "select * from ft_user WHERE ftid = ? ";//查到那一行
+   		String tmp = "";
    		try {
    			Connection conn = DriverManager.getConnection(url,username,password);
    			preSt = conn.prepareStatement(sql);
    			preSt.setInt(1, ftid);
    			rs = preSt.executeQuery();
-   			 System.out.print(" query success!"+rs);
+   			System.out.print(" query success!   "+rs);
+    			while (rs.next()) {
+       				tmp = rs.getString("password");
+    			}
    		} catch (SQLException e) { 
    		e.printStackTrace();
    		}
-        return rs.getString(2);
+        return tmp;
+    }
+    
+    public String getName(int ftid) throws SQLException  {
+   		String sql = "select * from ft_user WHERE ftid = ? ";//查到那一行
+   		String tmp = "";
+   		try {
+   			Connection conn = DriverManager.getConnection(url,username,password);
+   			preSt = conn.prepareStatement(sql);
+   			preSt.setInt(1, ftid);
+   			rs = preSt.executeQuery();
+   			System.out.print(" query success!   "+rs);
+    			while (rs.next()) {
+       				tmp = rs.getString("username");
+    			}
+   		} catch (SQLException e) { 
+   		e.printStackTrace();
+   		}
+        return tmp;
     }
     
     public int getNewestId() {
@@ -133,7 +155,7 @@ public class FtUser {
    			while (rs.next()) {
    				tmp = rs.getInt(1);
 			}
-			System.out.println("id:"+tmp);
+			System.out.println("the latest id:  "+tmp);
 		} catch (SQLException e) { 
 		e.printStackTrace();
 		}
@@ -143,7 +165,9 @@ public class FtUser {
     public String getUserName() {
     	return this.name;
     }
-    
+    public int getFtid() {
+    	return this.id;
+    }
 
     // password 不能change 12.31 16:06 为什么呢?
     public void setPassword(int ftid,String pwd) {
@@ -218,7 +242,7 @@ public class FtUser {
                 "}\n";// you should use String s2=new String(s1); id will change ,
     }// you can't use id to copy string in the method, name will change out of the method
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
 		 	FtUser p = new FtUser();
 		 	int id2 = 0 ;
 //		    try {
@@ -228,19 +252,25 @@ public class FtUser {
 //				e.printStackTrace();
 //			}//注册, 已完成
 		    boolean flag = false;
-//			for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) {
-//				 String tmpname = ite.next().getUserName();
-//		        if (tmpname.equals("user10") ) {
-//					flag = true;//如果有一样的,  那就报告重复, 通知
-//				}
-//				System.out.println(tmpname);
-//		    }
+		    for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) {
+		    	FtUser tmpft = ite.next();// we cannot use next() twice .
+				 int tmpid = tmpft.getFtid();
+		        if (tmpid == 202 ) {
+					//如果有一样的,  那就报告重复, 通知
+		        	System.out.println("	password =  "+ tmpft.getPassword(tmpid));
+					if (tmpft.getPassword(tmpid).equals("wes")) {
+						flag = true;
+						System.out.println("	password =  "+ tmpft.getPassword(tmpid));
+					}
+				}
+				System.out.println("id = "+ tmpid);
+		    }
 		 	//p.setPassword(102, "pass101");//修改密码, 已完成
 		 	//p.setName(1, "usertry");// 修改名字, 已完成
-			//p.delete(603);// 通过ftid 删除已完成
-		 	//System.out.println(p.vt); // show all line in the table
+			//p.delete(503);// 通过ftid 删除已完成
+		 	System.out.println(p.vt); // show all line in the table
 		    System.out.println(" finished");
-		    System.out.println(p.getNewestId());
+		//    System.out.println(p.getNewestId());
 		    System.out.println(flag);
 		}
 }

@@ -176,7 +176,7 @@ public static void main(String[] args) {
 
 
 
-### 遍历vector
+### 遍历存储类的vector
 
 ```java
 for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) 
@@ -189,3 +189,26 @@ for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();)
 ```
 it.next()指向这个类, ite.next().name获得类中的变量
 
+为啥他只能当前的不能现在的.
+
+#### 在流中操作
+
+stream()可以在存储类的collection同时运算, distinct()滤除重复元素.
+
+G7.stream().map( x->x.toUpper()().distinct().collect( )
+
+)
+
+G7.stream().filter
+
+
+
+用()->{} 代替匿名类.
+
+enum 枚举类.
+
+
+
+class c = class.forName(servlet);
+
+servlet m = (Servlet) c.newInstance();
