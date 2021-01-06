@@ -11,6 +11,7 @@ public interface FangTangConstants {
 	public static int CONTINUESEND = 44;
 	public static int LOGIN = 55;
 	public static int REGISTER = 66;
+	public static int SENDMESSAGE = 67;
 	
 	class logrequest implements Serializable{
 		/**

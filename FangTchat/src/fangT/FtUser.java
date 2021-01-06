@@ -137,7 +137,7 @@ public class FtUser {
    			rs = preSt.executeQuery();
    			System.out.print(" query success!   "+rs);
     			while (rs.next()) {
-       				tmp = rs.getString("username");
+       				tmp = rs.getString("name");
     			}
    		} catch (SQLException e) { 
    		e.printStackTrace();
@@ -255,10 +255,10 @@ public class FtUser {
 		    for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) {
 		    	FtUser tmpft = ite.next();// we cannot use next() twice .
 				 int tmpid = tmpft.getFtid();
-		        if (tmpid == 202 ) {
+		        if (tmpid == 19032 ) {
 					//如果有一样的,  那就报告重复, 通知
 		        	System.out.println("	password =  "+ tmpft.getPassword(tmpid));
-					if (tmpft.getPassword(tmpid).equals("wes")) {
+					if (tmpft.getPassword(tmpid).equals("123")) {
 						flag = true;
 						System.out.println("	password =  "+ tmpft.getPassword(tmpid));
 					}
