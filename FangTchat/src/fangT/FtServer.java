@@ -11,14 +11,14 @@ import fangT.FangTclient.BtnConnHandler;
 //import java.util.concurrent.Executors;
 
 public class FtServer implements FangTangConstants{
-	private ConcurrentHashMap<Socket, String> users = new ConcurrentHashMap<Socket, String>();//save user name and socket
+	private ConcurrentHashMap<Integer, String> users = new ConcurrentHashMap<Integer, String>();//save user name and socket
 	String localName = null;
 	String hostName;
 	private int clientNo = 0;//number a client
 	DataInputStream fromClient;
 	DataOutputStream toClient ;
 	FtUser ftuser = new FtUser();
-	boolean flag = false ; // in the method init flag will occur error 匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
+	boolean flag = false ; //匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
 	public static void main(String[] args){
 			try {
 				new FtServer().Service();
@@ -60,6 +60,8 @@ public class FtServer implements FangTangConstants{
 						if (tmpft.getPassword(tmpid).equals(pwd)) {
 							flag = true;
 							System.out.println("	password =  "+ ftuser.getPassword(tmpid));
+							localName = tmpft.getName(ftid);
+							users.put(ftid,localName);
 						}
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -72,7 +74,7 @@ public class FtServer implements FangTangConstants{
 			else {
 				try {
 					toClient.writeUTF("login in success!  username is "+ftuser.getName(ftid)+"  账号为 "+ftid);
-					users.put(socket,hostName);// 登录状态为1; 
+					// 登录状态为1; 
 				} catch (Exception e) {
 					e.printStackTrace();
 				} 
@@ -97,7 +99,7 @@ public class FtServer implements FangTangConstants{
 		}
 
 		public void responseSentence(String msg) throws IOException {
-		
+			
 		}
 		public void run() {//本地服务器控制台显示客户端连接的用户信息
 			System.out.println("New connection accept:" + socket.getInetAddress());
@@ -105,7 +107,7 @@ public class FtServer implements FangTangConstants{
 				fromClient = new DataInputStream(socket.getInputStream());
 				toClient = new DataOutputStream(socket.getOutputStream());
 				int ftid;	
-				String username;	String password;
+				String username = "";	String password;
 				toClient.writeInt(CONNECTSUCCESS);//给他一个信号,可以开始了。对应int logstatus = fromServer.readInt()
 				System.out.println("发送CONNECTSUCCESS信号 可以开始");// 应该要先开启服务器再开启客户端否则会连接不上。因为客户端开启就直接建立连接了。
 				while (true) {
@@ -126,11 +128,11 @@ public class FtServer implements FangTangConstants{
 						}
 					}
 					else if (signal == SENDMESSAGE) {
-						System.out.println("	收到信息.... ");
-						toClient.writeInt( CONTINUESEND);
-						//int InfoType = fromClient.readInt();
+						System.out.println(username+"	给服务器发送信息.... ");
+						toClient.writeUTF("收到的信息 = "+username);
+						//int InfoType = fromClient.readInt();//目前先做群聊,
 						String message = fromClient.readUTF();
-						System.out.println("收到的用户名和密码为 = "+message);
+						System.out.println("收到的信息 = "+message);
 						responseSentence(message);
 					}
 				}

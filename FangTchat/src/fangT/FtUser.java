@@ -135,12 +135,12 @@ public class FtUser {
    			preSt = conn.prepareStatement(sql);
    			preSt.setInt(1, ftid);
    			rs = preSt.executeQuery();
-   			System.out.print(" query success!   "+rs);
+   			System.out.print(" query success!   ");
     			while (rs.next()) {
        				tmp = rs.getString("name");
     			}
    		} catch (SQLException e) { 
-   		e.printStackTrace();
+   			e.printStackTrace();
    		}
         return tmp;
     }
@@ -255,7 +255,7 @@ public class FtUser {
 		    for(Iterator<FtUser> ite = p.vt.iterator(); ite.hasNext();) {
 		    	FtUser tmpft = ite.next();// we cannot use next() twice .
 				 int tmpid = tmpft.getFtid();
-		        if (tmpid == 19032 ) {
+		        if (tmpid == 1903 ) {
 					//如果有一样的,  那就报告重复, 通知
 		        	System.out.println("	password =  "+ tmpft.getPassword(tmpid));
 					if (tmpft.getPassword(tmpid).equals("123")) {
@@ -269,8 +269,8 @@ public class FtUser {
 		 	//p.setName(1, "usertry");// 修改名字, 已完成
 			//p.delete(503);// 通过ftid 删除已完成
 		 	System.out.println(p.vt); // show all line in the table
-		    System.out.println(" finished");
+		    System.out.println(" finished\n");
 		//    System.out.println(p.getNewestId());
-		    System.out.println(flag);
+		    System.out.println(p.getName(1603));
 		}
 }

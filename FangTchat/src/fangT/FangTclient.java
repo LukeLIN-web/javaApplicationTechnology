@@ -55,7 +55,7 @@ public class FangTclient extends Application implements FangTangConstants{
 	// btConn.defaultButtonProperty();
 		btConn.setOnAction(new BtnConnHandler() );
 		btnSend.setOnAction(new BtnSendHandler() );
-	//	tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
+		tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
 		btRegst.setOnAction(new BtnRegstHandler());
 		btnExit.setOnAction(event -> {
 			try {
@@ -80,7 +80,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			fromServer = new DataInputStream(socket.getInputStream());
 			System.out.println("连接成功！！ ");
 		} catch (Exception e) {
-			e.printStackTrace();// TODO: handle exception
+			e.printStackTrace();
 		}
 		new Thread( () ->{
 			try {
@@ -91,16 +91,23 @@ public class FangTclient extends Application implements FangTangConstants{
 						taDisplay.appendText("	连接成功!!!  欢迎使用服务！请输入用户名：\n");	//remind user to input user name
 					});
 					btnSend.setDisable(false);
-					// todo: 可以开始. 做一些设置。
+					// TODO: 可以开始. 做一些设置。
 				} else if (logstatus == CONNECTFAIL) {
 					Platform.runLater( ()->{
 						taDisplay.appendText("	连接失败!!! \n");
 					});
-					//todo :重新尝试连接.
+					//TODO :重新尝试连接.
 				}
-				while(continueToSend) { // 大多数时候停留在这里,等人按按钮
+				if(continueToSend) { 
 					waitForSendAction();//发送信息放在按钮事件中
 					receiveInfoFromServer();
+				}
+				String msg = null;// after connected then communicate with server.
+				while ((msg = fromServer.readUTF() ) != null) {// 大多数时候停留在这里,等人按按钮
+					String tmp = msg;
+					Platform.runLater( ()->{
+						taDisplay.appendText("	收到消息!! \n"+tmp);
+					});
 				}
 			} catch (Exception e) {
 				e.printStackTrace();// TODO: handle exception
@@ -144,7 +151,6 @@ public class FangTclient extends Application implements FangTangConstants{
 		}	
 	}
 	
-
 	// 把前端的工作分离出start();
 	public void adjustStyle(Stage primaryStage) {
 		BorderPane mainPane=new BorderPane();//BorderPane，默认就分割好了上下左右中的五个部分

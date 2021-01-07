@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Wed Jan 06 14:47:39 CST 2021:
+Wed Jan 06 16:46:23 CST 2021:
 正在使用类加载程序 jdk.internal.loader.ClassLoaders$AppClassLoader@15db9742 引导数据库
-目录 D:\eclipse\FangTchat\Derby_data\dedb 中的 Derby 版本 The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585) 实例 a816c00e-0176-d673-746d-00000f588fc8
+目录 D:\eclipse\FangTchat\Derby_data\dedb 中的 Derby 版本 The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585) 实例 a816c00e-0176-d6e0-2a33-00000f588fc8
 已从 file:/D:/eclipse/FangTchat/db-derby-10.15.2.0-bin/lib/derby.jar 加载
 java.vendor=Oracle Corporation
 java.runtime.version=14.0.2+12-46
