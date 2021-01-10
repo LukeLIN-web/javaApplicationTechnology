@@ -5,13 +5,10 @@ import java.net.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;//实现线程安全. 
-
-import fangT.FangTclient.BtnConnHandler;
 //import java.util.concurrent.ExecutorService;
 //import java.util.concurrent.Executors;
-
 public class FtServer implements FangTangConstants{
-	private ConcurrentHashMap<Integer, String> users = new ConcurrentHashMap<Integer, String>();//save user name and socket
+	private ConcurrentHashMap<Integer, Socket> users = new ConcurrentHashMap<Integer, Socket>();//save user name and socket
 	String localName = null;
 	String hostName;
 	private int clientNo = 0;//number a client
@@ -42,26 +39,29 @@ public class FtServer implements FangTangConstants{
 			this.socket = socket;
 		}
 		//判断用户是否已经下线
-		private Boolean isLeaved(Socket temp){
-			Boolean leave=true;
-			for(Map.Entry<Socket,String> mapEntry : users.entrySet()) {
-				if (mapEntry.getKey().equals(temp))
-					leave = false;
-				}
-			return leave;
-		}
-		public void responseLogin(int ftid,String pwd) throws IOException {
+//		private Boolean isLeaved(Integer temp){
+//			Boolean leave=true;
+//			for(Map.Entry<Integer,String> mapEntry : users.entrySet()) {
+//				if (mapEntry.getKey().equals(temp))
+//					leave = false;
+//				}
+//			return leave;
+//		}
+		public boolean responseLogin(int ftid,String pwd) throws IOException {
 			boolean flag = false;
+			if (users.containsKey(ftid)) {
+				return false;//如果已经登录, 那就登录失败, 退出时可以移除.
+			}
 		    for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();) {
 		    	FtUser tmpft = ite.next();// we cannot use next() twice .
-				 int tmpid = tmpft.getFtid();
+				int tmpid = tmpft.getFtid();
 		        if (tmpid == ftid ) {
 					try {
 						if (tmpft.getPassword(tmpid).equals(pwd)) {
 							flag = true;
 							System.out.println("	password =  "+ ftuser.getPassword(tmpid));
 							localName = tmpft.getName(ftid);
-							users.put(ftid,localName);
+							users.put(ftid,socket);// login success
 						}
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -70,7 +70,7 @@ public class FtServer implements FangTangConstants{
 		    }
 			if(flag == false) {				//如果没有一样的,那就返回错误信息
 				toClient.writeUTF("fail login! 服务器收到的id和密码为  =    "+ftid+pwd+"\n账号或密码错误! 请重新输入账号或密码,然后再次点击登录按钮!\n  ");	
-			}
+			}// 失败了, 服务器要转发一个信息回去把连接按钮enable
 			else {
 				try {
 					toClient.writeUTF("login in success!  username is "+ftuser.getName(ftid)+"  账号为 "+ftid);
@@ -79,6 +79,7 @@ public class FtServer implements FangTangConstants{
 					e.printStackTrace();
 				} 
 			}
+			return flag;
 		}
 		public void responseRgstr(String usr,String pwd) throws IOException {
 			boolean flag = false;
@@ -106,37 +107,41 @@ public class FtServer implements FangTangConstants{
 			try { 
 				fromClient = new DataInputStream(socket.getInputStream());
 				toClient = new DataOutputStream(socket.getOutputStream());
-				int ftid;	
+				int ftid = 0;
+				boolean flag = false;	
 				String username = "";	String password;
 				toClient.writeInt(CONNECTSUCCESS);//给他一个信号,可以开始了。对应int logstatus = fromServer.readInt()
 				System.out.println("发送CONNECTSUCCESS信号 可以开始");// 应该要先开启服务器再开启客户端否则会连接不上。因为客户端开启就直接建立连接了。
 				while (true) {
 					int signal = fromClient.readInt();// 信号是登录呢？ 还是信息呢？ 还是注册呢？还是退出呢？
-					if(signal == LOGIN || signal == REGISTER) {
+					if(signal == LOGIN) {
 						System.out.println("	接收用户名和密码中.... ");
 						toClient.writeInt( CONTINUESEND);
-						if(signal == LOGIN) {
-							ftid = fromClient.readInt();
-							password = fromClient.readUTF();
-							responseLogin(ftid,password);
-						}
-						else{
-							username = fromClient.readUTF();
-							password = fromClient.readUTF();
-							System.out.println("收到的用户名和密码为 = "+username+password);
-							responseRgstr(username,password);
-						}
+						ftid = fromClient.readInt();
+						password = fromClient.readUTF();
+						flag = responseLogin(ftid,password);
 					}
-					else if (signal == SENDMESSAGE) {
-						System.out.println(username+"	给服务器发送信息.... ");
-						toClient.writeUTF("收到的信息 = "+username);
-						//int InfoType = fromClient.readInt();//目前先做群聊,
-						String message = fromClient.readUTF();
-						System.out.println("收到的信息 = "+message);
-						responseSentence(message);
+					else if(signal == REGISTER) {
+						System.out.println("	接收用户名和密码中.... ");
+						toClient.writeInt( CONTINUESEND);
+						username = fromClient.readUTF();
+						password = fromClient.readUTF();
+						System.out.println("收到的用户名和密码为 = "+username+password);
+						responseRgstr(username,password);
 					}
+					else {
+						toClient.writeInt(STOPSEND);//如果是其他的话返回错误信息
+					}
+					if (flag) 
+						break;
 				}
-
+				String message = null;
+				while( (message  = fromClient.readUTF() )!= null ) {
+					System.out.println("服务器收到信息 = "+message+" 来自: "+users.get(ftid));
+					toClient.writeUTF("收到的信息 = "+message+"来自"+username);
+					//int InfoType = fromClient.readInt();//目前先做群聊,
+					responseSentence(message);
+				}
 ////				while ((hostName = fromClient.readUTF()) != null){
 ////					users.forEach((k,v)->{
 ////					if (v.equals(hostName))
@@ -149,7 +154,7 @@ public class FtServer implements FangTangConstants{
 ////					}
 ////					else{
 ////						flag=false;// use flag to avoid same name
-////					}// 失败了, 服务器要转发一个信息回去把连接按钮enable
+////					}
 ////				}
 ////				sendToMembers("已经上线", localName, socket);//login in success 这个好难实现, 
 ////				dout.writeUTF("输入命令功能    谢谢谢谢 ");
@@ -244,12 +249,11 @@ public class FtServer implements FangTangConstants{
 			}
 		}
 	}
-	
-	
+	//服务器停留在这循环里等待连接.
 	public void Service() throws IOException{
 		while(true) {
 			Socket s = null ;
-			s = serverSocket.accept();//等待直到有客户端连接到这个端口
+			s = serverSocket.accept();//等待直到有客户端连接到这个端口,1个监听socket,每次accept成功后返回一个数据socket, 再继续用监听socket监听
 			clientNo ++;
 			InetAddress inetAddress = s.getInetAddress();//when a new client join the chat, print the IP address and the hostname. 
 			System.out.println("client "+clientNo +"   host name is "+ inetAddress.getHostName());

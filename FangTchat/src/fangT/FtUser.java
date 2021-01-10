@@ -267,7 +267,7 @@ public class FtUser {
 		    }
 		 	//p.setPassword(102, "pass101");//修改密码, 已完成
 		 	//p.setName(1, "usertry");// 修改名字, 已完成
-			//p.delete(503);// 通过ftid 删除已完成
+			//p.delete(1703);// 通过ftid 删除已完成
 		 	System.out.println(p.vt); // show all line in the table
 		    System.out.println(" finished\n");
 		//    System.out.println(p.getNewestId());

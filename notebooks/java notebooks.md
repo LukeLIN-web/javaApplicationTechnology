@@ -212,3 +212,11 @@ enum 枚举类.
 class c = class.forName(servlet);
 
 servlet m = (Servlet) c.newInstance();
+
+
+
+### 在map中寻找
+
+get() 
+
+containKey()
