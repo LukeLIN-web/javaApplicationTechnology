@@ -4,11 +4,12 @@ import java.io.*;
 import java.net.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.*;//实现线程安全. 
 //import java.util.concurrent.ExecutorService;
 //import java.util.concurrent.Executors;
 public class FtServer implements FangTangConstants{
-	private ConcurrentHashMap<Integer, Socket> users = new ConcurrentHashMap<Integer, Socket>();//save user name and socket
+	private ConcurrentHashMap<Socket,Integer> users = new ConcurrentHashMap<Socket,Integer>();//save user name and socket
 	String localName = null;
 	String hostName;
 	private int clientNo = 0;//number a client
@@ -49,7 +50,7 @@ public class FtServer implements FangTangConstants{
 //		}
 		public boolean responseLogin(int ftid,String pwd) throws IOException {
 			boolean flag = false;
-			if (users.containsKey(ftid)) {
+			if (users.containsValue(ftid)) {
 				return false;//如果已经登录, 那就登录失败, 退出时可以移除.
 			}
 		    for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();) {
@@ -61,7 +62,7 @@ public class FtServer implements FangTangConstants{
 							flag = true;
 							System.out.println("	password =  "+ ftuser.getPassword(tmpid));
 							localName = tmpft.getName(ftid);
-							users.put(ftid,socket);// login success
+							users.put(socket,ftid);// login success
 						}
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -115,14 +116,14 @@ public class FtServer implements FangTangConstants{
 				while (true) {
 					int signal = fromClient.readInt();// 信号是登录呢？ 还是信息呢？ 还是注册呢？还是退出呢？
 					if(signal == LOGIN) {
-						System.out.println("	接收用户名和密码中.... ");
-						toClient.writeInt( CONTINUESEND);
+						System.out.println("\n服务器接收用户名和密码中.... ");
+						toClient.writeInt(CONTINUESEND);
 						ftid = fromClient.readInt();
 						password = fromClient.readUTF();
 						flag = responseLogin(ftid,password);
 					}
 					else if(signal == REGISTER) {
-						System.out.println("	接收用户名和密码中.... ");
+						System.out.println("\n服务器接收用户名和密码中.... ");
 						toClient.writeInt( CONTINUESEND);
 						username = fromClient.readUTF();
 						password = fromClient.readUTF();
@@ -132,32 +133,22 @@ public class FtServer implements FangTangConstants{
 					else {
 						toClient.writeInt(STOPSEND);//如果是其他的话返回错误信息
 					}
-					if (flag) 
+					if (flag) {
+						sendToMembers("已经上线",  localName,socket);//login in success 这个好难实现, 
+						toClient.writeUTF("输入命令功能    (1)L(list):查看当前上线用户;(2)G(group):"
+								+ "进入群聊;(3)O(one-one):私信;(4)E(exit):退出当前聊天状态;(5)bye:离线;(6)H(help):帮助 ");
 						break;
+					}
 				}
 				String message = null;
 				while( (message  = fromClient.readUTF() )!= null ) {
-					System.out.println("服务器收到信息 = "+message+" 来自: "+users.get(ftid));
-					toClient.writeUTF("收到的信息 = "+message+"来自"+username);
+					System.out.println("服务器收到信息 = "+message+" 来自: "+users.get(socket));
+					toClient.writeUTF("\n收到的信息 = "+message+"来自"+localName+"\n");
 					//int InfoType = fromClient.readInt();//目前先做群聊,
 					responseSentence(message);
 				}
-////				while ((hostName = fromClient.readUTF()) != null){
-////					users.forEach((k,v)->{
-////					if (v.equals(hostName))
-////						flag =true;//线程修改了全局变量
-////					});
-////					if (!flag){
-////						localName=hostName;
-////						users.put(socket,hostName);
-////						flag=false;	break;
-////					}
-////					else{
-////						flag=false;// use flag to avoid same name
-////					}
-////				}
-////				sendToMembers("已经上线", localName, socket);//login in success 这个好难实现, 
-////				dout.writeUTF("输入命令功能    谢谢谢谢 ");
+
+
 //				//下面这些太冗长了, 怎么处理?
 //				String msg = null;
 //			
@@ -264,24 +255,25 @@ public class FtServer implements FangTangConstants{
 	}
 
 	// send to all users save socket in hash map
-	private void sendToMembers(String msg,String hostAddress,Socket mySocket) throws IOException{
+	private void sendToMembers(String msg,String hostName,Socket mySocket) throws IOException{
 		OutputStream outstream = mySocket.getOutputStream();//通过socket
 		DataOutputStream dout = new DataOutputStream(outstream);
-		Iterator iterator = users.entrySet().iterator();
+		Iterator<Entry<Socket, Integer>> iterator = users.entrySet().iterator();
 		while (iterator.hasNext()){
-			Map.Entry entry=(Map.Entry) iterator.next();
+			Map.Entry<Socket,Integer>  entry = (Map.Entry<Socket,Integer> ) iterator.next();
 			Socket tempSocket = (Socket) entry.getKey();
-			//String name = (String) entry.getValue();
+			System.out.println("查询到 ftid = "+entry.getValue());
 			if (!tempSocket.equals(mySocket)){
-				//out = tempSocket.getOutputStream();
-				dout.writeUTF(hostAddress+"："+msg);
+				dout.writeUTF(hostName+"："+msg);
+				System.out.println("hostname = "+hostName+"msg = "+msg);
 			}
 		}
 	}
+	
 	// send to specific socket
 	private void sendToOne(String msg,String hostAddress,Socket another) throws IOException{
 		OutputStream out;
-		Iterator iterator=users.entrySet().iterator();
+		Iterator<Entry<Socket, Integer>> iterator = users.entrySet().iterator();
 		while (iterator.hasNext()){
 			Map.Entry entry=(Map.Entry) iterator.next();
 			Socket tempSocket = (Socket) entry.getKey();
@@ -293,5 +285,4 @@ public class FtServer implements FangTangConstants{
 			}
 		}
 	}
-
 }

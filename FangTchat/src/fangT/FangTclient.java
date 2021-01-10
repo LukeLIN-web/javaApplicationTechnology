@@ -113,7 +113,7 @@ public class FangTclient extends Application implements FangTangConstants{
 		}
 		).start();
 	}
-	//接收服务器发来的消息,并且写到textarea
+	//接收服务器发来的消息
 	private int receiveInfoFromServer() throws IOException{
 		int currentStatus = fromServer.readInt();
 		if (currentStatus == STOPSEND) {
