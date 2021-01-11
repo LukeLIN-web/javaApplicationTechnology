@@ -10,13 +10,9 @@ import java.util.concurrent.*;//实现线程安全.
 //import java.util.concurrent.Executors;
 public class FtServer implements FangTangConstants{
 	private ConcurrentHashMap<Socket,Integer> users = new ConcurrentHashMap<Socket,Integer>();//save user name and socket
-	String localName = null;
-	String hostName;
 	private int clientNo = 0;//number a client
-	DataInputStream fromClient;
-	DataOutputStream toClient ;
-	FtUser ftuser = new FtUser();
-	boolean flag = false ; //匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
+	FtUser ftuser = new FtUser();//数据库只有一个,可以用全局变量
+	//匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
 	public static void main(String[] args){
 			try {
 				new FtServer().Service();
@@ -24,20 +20,21 @@ public class FtServer implements FangTangConstants{
 				e.printStackTrace();// maybe you can show message JoptionPane
 			}
 	}
-
+	
 	private ServerSocket serverSocket;//定义服务器套接字
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	public FtServer() throws IOException{		
 		serverSocket = new ServerSocket(port);
 		System.out.println(new Date()+"服务器启动监听在"+port+"端口...");  //constructor init the serversocket
 	}
-
 	// can send and receive
 	class Handler implements Runnable{
 		private Socket socket;
 		boolean isExist;
+		String localName = null;
 		public Handler(Socket socket) {// constructor
 			this.socket = socket;
+			System.out.print(socket);
 		}
 		//判断用户是否已经下线
 //		private Boolean isLeaved(Integer temp){
@@ -61,7 +58,7 @@ public class FtServer implements FangTangConstants{
 						if (tmpft.getPassword(tmpid).equals(pwd)) {
 							flag = true;
 							System.out.println("	password =  "+ ftuser.getPassword(tmpid));
-							localName = tmpft.getName(ftid);
+							localName = tmpft.getName(ftid);//当前登录的人的名字, 传递给sendmembers方法.
 							users.put(socket,ftid);// login success
 						}
 					} catch (SQLException e) {
@@ -69,20 +66,9 @@ public class FtServer implements FangTangConstants{
 					}
 				}
 		    }
-			if(flag == false) {				//如果没有一样的,那就返回错误信息
-				toClient.writeUTF("fail login! 服务器收到的id和密码为  =    "+ftid+pwd+"\n账号或密码错误! 请重新输入账号或密码,然后再次点击登录按钮!\n  ");	
-			}// 失败了, 服务器要转发一个信息回去把连接按钮enable
-			else {
-				try {
-					toClient.writeUTF("login in success!  username is "+ftuser.getName(ftid)+"  账号为 "+ftid);
-					// 登录状态为1; 
-				} catch (Exception e) {
-					e.printStackTrace();
-				} 
-			}
 			return flag;
 		}
-		public void responseRgstr(String usr,String pwd) throws IOException {
+		public boolean responseRgstr(String usr,String pwd) throws IOException {
 			boolean flag = false;
 			for(Iterator<FtUser> ite = ftuser.vt.iterator(); ite.hasNext();) {
 				 String tmpname = ite.next().getUserName();
@@ -90,24 +76,30 @@ public class FtServer implements FangTangConstants{
 					flag = true;//如果有一样的,  那就报告重复, 通知
 				}
 		    }
-			if(flag == false) {
-				ftuser.add(usr, pwd);//如果没有一样的,那就注册一个
-				int id = ftuser.getNewestId();
-				toClient.writeUTF("没有用户名, 注册了一个账户, 用户名为 =    "+usr+"账号为 "+id + " 请牢记! 服务器收到的用户名为 =    "+usr);
+			if (!flag) {
+				ftuser.add(usr, pwd);		//如果没有一样的,那就注册一个
 			}
-			else {
-				toClient.writeUTF("用户名"+usr+"已经存在, 请重新输入用户名和密码,再次点击注册按钮!  ");
-			}
+			return flag;
 		}
 
-		public void responseSentence(String msg) throws IOException {
-			
+		public int responseSentence(String msg) throws IOException {
+			switch (msg.trim().toUpperCase()){
+				case "BYE": {// exit
+					//dout.writeUTF("From 服务器：服务器已断开连接，结束服务！");
+						sendToMembers("已经下线", localName, socket);
+						System.out.println(" 客户端 "+localName+" 离开 ");
+						users.remove(socket);
+						return 1;
+					}
+				
+				default : return 99;
+			}
 		}
 		public void run() {//本地服务器控制台显示客户端连接的用户信息
 			System.out.println("New connection accept:" + socket.getInetAddress());
 			try { 
-				fromClient = new DataInputStream(socket.getInputStream());
-				toClient = new DataOutputStream(socket.getOutputStream());
+				DataInputStream fromClient = new DataInputStream(socket.getInputStream());
+				DataOutputStream toClient = new DataOutputStream(socket.getOutputStream());
 				int ftid = 0;
 				boolean flag = false;	
 				String username = "";	String password;
@@ -121,6 +113,17 @@ public class FtServer implements FangTangConstants{
 						ftid = fromClient.readInt();
 						password = fromClient.readUTF();
 						flag = responseLogin(ftid,password);
+						if(flag == false) {				//如果没有一样的,那就返回错误信息
+							toClient.writeUTF("fail login! 服务器收到的id和密码为  =    "+ftid+password+"\n账号或密码错误! 请重新输入账号或密码,然后再次点击登录按钮!\n  ");	
+						}// 失败了, 服务器要转发一个信息回去把连接按钮enable
+						else {
+							try {
+								toClient.writeUTF("login in success!  username is "+ftuser.getName(ftid)+"  账号为 "+ftid);
+								// 登录状态为1; 
+							} catch (Exception e) {
+								e.printStackTrace();
+							} 
+						}
 					}
 					else if(signal == REGISTER) {
 						System.out.println("\n服务器接收用户名和密码中.... ");
@@ -128,7 +131,13 @@ public class FtServer implements FangTangConstants{
 						username = fromClient.readUTF();
 						password = fromClient.readUTF();
 						System.out.println("收到的用户名和密码为 = "+username+password);
-						responseRgstr(username,password);
+						if(responseRgstr(username,password) == false) {
+							int id = ftuser.getNewestId();
+							toClient.writeUTF("没有用户名, 注册了一个账户, 用户名为 =    "+username+"账号为 "+id + " 请牢记! 服务器收到的用户名为 =    "+username);
+						}
+						else {
+							toClient.writeUTF("用户名"+username+"已经存在, 请重新输入用户名和密码,再次点击注册按钮!  ");
+						}
 					}
 					else {
 						toClient.writeInt(STOPSEND);//如果是其他的话返回错误信息
@@ -142,13 +151,23 @@ public class FtServer implements FangTangConstants{
 				}
 				String message = null;
 				while( (message  = fromClient.readUTF() )!= null ) {
-					System.out.println("服务器收到信息 = "+message+" 来自: "+users.get(socket));
-					toClient.writeUTF("\n收到的信息 = "+message+"来自"+localName+"\n");
+					System.out.println(socket);
+					System.out.println("服务器收到信息 = "+message+" 来自: "+users.get(socket));//第二个执行
+					toClient.writeUTF("\n收到的信息 = "+message+"来自"+localName+"\n");//第三个执行
 					//int InfoType = fromClient.readInt();//目前先做群聊,
-					responseSentence(message);
+					int tag = responseSentence(message);
+					switch (tag) {
+						case 1: {
+							toClient.writeUTF("From 服务器：服务器已断开连接，结束服务！");//然后在客户端可以开启重新登录, 可能以后再做.功能是做不完的.2021年1月11日.
+							fromClient.close();
+							toClient.close();
+							break;
+						}
+						
+						default:
+									
+					}  
 				}
-
-
 //				//下面这些太冗长了, 怎么处理?
 //				String msg = null;
 //			
@@ -254,18 +273,20 @@ public class FtServer implements FangTangConstants{
 		}
 	}
 
-	// send to all users save socket in hash map
-	private void sendToMembers(String msg,String hostName,Socket mySocket) throws IOException{
-		OutputStream outstream = mySocket.getOutputStream();//通过socket
-		DataOutputStream dout = new DataOutputStream(outstream);
+	// send to all users save socket in hash map,怎么实现发给别人呢?通过socket新建一个stream
+	private void sendToMembers(String msg,String hostName,Socket mySocket) throws IOException{ 
+		DataOutputStream dout; 
 		Iterator<Entry<Socket, Integer>> iterator = users.entrySet().iterator();
+		System.out.println("开始通知所有人他已经登录!m my socket = ");
+		System.out.println(mySocket);//传入的mySocket好像没有错确实是第二个客户端的socket
 		while (iterator.hasNext()){
 			Map.Entry<Socket,Integer>  entry = (Map.Entry<Socket,Integer> ) iterator.next();
 			Socket tempSocket = (Socket) entry.getKey();
-			System.out.println("查询到 ftid = "+entry.getValue());
+			System.out.println(tempSocket);
 			if (!tempSocket.equals(mySocket)){
+				dout = new DataOutputStream(tempSocket.getOutputStream());//根据保存的来新建, 应该是socket是一样的,只是多建了几个流
 				dout.writeUTF(hostName+"："+msg);
-				System.out.println("hostname = "+hostName+"msg = "+msg);
+				System.out.println("dout.writeUTF hostname = "+hostName+"msg = "+msg);
 			}
 		}
 	}

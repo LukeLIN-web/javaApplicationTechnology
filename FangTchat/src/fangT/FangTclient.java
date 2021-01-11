@@ -51,6 +51,7 @@ public class FangTclient extends Application implements FangTangConstants{
 	@Override
 	public void start(Stage primaryStage) { //start()方法传入的Stage对象在JavaFX程序加载时被加载（JavaFX的Stage是顶层容器）
 		adjustStyle(primaryStage);
+		primaryStage.show();
 	// btConn.defaultButtonProperty();
 		btConn.setOnAction(new BtnConnHandler() );
 		btnSend.setOnAction(new BtnSendHandler() );
@@ -80,39 +81,27 @@ public class FangTclient extends Application implements FangTangConstants{
 			Platform.runLater( ()->{
 				taDisplay.appendText("	启动客户端成功! 连接服务器成功!!  \n");
 			});
+			System.out.print("debug 语句1 ");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		new Thread( () ->{
-			try {
-				int logstatus = fromServer.readInt();//服务器告诉他可以开始了
-				if(logstatus == CONNECTSUCCESS) {
+		try {
+			System.out.print("debug 语句2 ");
+			int logstatus = fromServer.readInt();//服务器告诉他可以开始了
+			if(logstatus == CONNECTSUCCESS) {
 					Platform.runLater( ()->{
 						taDisplay.appendText("	连接成功!!!  欢迎使用服务！\n请输入用户名：\n");});	//remind user to input user name
 					btnSend.setDisable(false);// TODO: 可以开始. 做一些设置。
-				} else if (logstatus == CONNECTFAIL) {
+			} else if (logstatus == CONNECTFAIL) {
 					Platform.runLater( ()->{
 						taDisplay.appendText("	连接失败!!! \n");});					//TODO :重新尝试连接.
-				}
-				while(continueToSend) {  //登录循环
-					waitForSendAction();//发送信息放在按钮事件中
-					int i = receiveInfoFromServer();//登录成功后break
-					if (i == CONTINUESEND) 
-						break;
-				}
-				// 进入发送信息循环. 这里可以把用户信息放入map
-				String msg = null;// after login then communicate with server.
-				while ((msg = fromServer.readUTF() ) != null) {// 大多数时候停留在这里,等用户按按钮来发送信息.
-					String tmp = msg;
-					Platform.runLater( ()->{
-						taDisplay.appendText("\n收到服务器的消息: "+tmp);});
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
+			System.out.print("debug 语句连接成功 ");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		).start();
 	}
+	
 	//接收服务器发来的消息
 	private int receiveInfoFromServer() throws IOException{
 		int currentStatus = fromServer.readInt();
@@ -128,8 +117,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			String tmp = fromServer.readUTF();// 阅读服务器的返回消息
 			resetByServerInfo(tmp);// 根据返回信息来设置客户端
 			Platform.runLater( ()->{
-				taDisplay.appendText("客户端返回"+tmp);
-				taDisplay.appendText("\n登录成功!  可以开始发送信息\n");
+				taDisplay.appendText("fromServer.readUTF()"+tmp);
 			});
 			return CONTINUESEND;
 		}
@@ -241,7 +229,8 @@ public class FangTclient extends Application implements FangTangConstants{
 			try {
 				toServer.writeInt(LOGIN);
 				toServer.writeInt(Integer.parseInt(ftid));
-				toServer.writeUTF(pwd);
+				toServer.writeUTF(pwd);//发送信息放在按钮事件中
+				System.out.print("debug 语句3 ");
 					Platform.runLater(()->{// 稍后更新GUI
 						LocalDateTime now = LocalDateTime.now();
 						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
@@ -252,6 +241,30 @@ public class FangTclient extends Application implements FangTangConstants{
 				//btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
 				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
 				btnSend.setDisable(false);
+				int i = receiveInfoFromServer();
+				if (i == CONTINUESEND) {
+					System.out.print("debug 语句4 ");//登录是严格的协议, 之后接收是多线程的.
+					try {
+						new Thread( () ->{
+							// 进入发送信息循环. 这里可以把用户信息放入map
+							String msg = null;// after login then communicate with server.
+							try {
+								while ((msg = fromServer.readUTF() ) != null) {// 大多数时候停留在这里,等用户按按钮来发送信息.
+									String tmp = msg;
+									Platform.runLater( ()->{
+										taDisplay.appendText("\n收到服务器的消息: "+tmp);});//第四个执行
+									System.out.println("debug 语句5 ");
+								}
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							Platform.runLater( ()->{
+								taDisplay.appendText("\n收到服务器的循环已经结束 ");});
+						}).start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}catch (Exception e){
 				taDisplay.appendText("服务器连接失败！"+e.getMessage()+"\n");
 			}
@@ -268,8 +281,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			taDisplay.appendText("\n本地客户端发送："+msg+"\n");
+			taDisplay.appendText("\n本地客户端发送："+msg+"\n");//第一个执行
 			if (msg.equalsIgnoreCase("bye")) //业务逻辑写在里面, 比较冗长.
 				resetByServerInfo("bye");//退出还应该发送一个消息给ftserver,让他移除掉用户
 			tfSend.clear();
