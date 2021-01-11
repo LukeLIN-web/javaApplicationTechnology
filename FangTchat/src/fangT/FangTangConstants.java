@@ -1,6 +1,5 @@
 package fangT;
-import java.lang.String;
-import java.io.Serializable;
+
 
 // 定义了程序中所有类共享的常量.
 public interface FangTangConstants {

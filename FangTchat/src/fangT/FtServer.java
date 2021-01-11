@@ -30,21 +30,21 @@ public class FtServer implements FangTangConstants{
 	// can send and receive
 	class Handler implements Runnable{
 		private Socket socket;
-		boolean isExist;
 		String localName = null;
+		boolean isExist = false;
 		public Handler(Socket socket) {// constructor
 			this.socket = socket;
 			System.out.print(socket);
 		}
 		//判断用户是否已经下线
-//		private Boolean isLeaved(Integer temp){
-//			Boolean leave=true;
-//			for(Map.Entry<Integer,String> mapEntry : users.entrySet()) {
-//				if (mapEntry.getKey().equals(temp))
-//					leave = false;
-//				}
-//			return leave;
-//		}
+		private Boolean isLeaved(Integer temp){
+			Boolean leave=true;
+			for(Map.Entry<Socket,Integer> mapEntry : users.entrySet()) {
+				if (mapEntry.getValue().equals(temp))
+					leave = false;
+				}
+			return leave;
+		}
 		public boolean responseLogin(int ftid,String pwd) throws IOException {
 			boolean flag = false;
 			if (users.containsValue(ftid)) {
@@ -84,22 +84,24 @@ public class FtServer implements FangTangConstants{
 
 		public int responseSentence(String msg) throws IOException {
 			switch (msg.trim().toUpperCase()){
-				case "BYE": {// exit
-					//dout.writeUTF("From 服务器：服务器已断开连接，结束服务！");
+				case "BYE": {// exit			
 						sendToMembers("已经下线", localName, socket);
 						System.out.println(" 客户端 "+localName+" 离开 ");
 						users.remove(socket);
 						return 1;
 					}
-				case "H":{// show help 
+				case "H":// show help 
 					return 2;
-				}
-				case "L":{// show help 
+				case "L":// show help 
 					return 3;
-				}
+				case "O": // send to one 
+					return 4; 
+				case "G": //group 
+					return 5;
 				default : return 99;
 			}
 		}
+		
 		public void run() {//本地服务器控制台显示客户端连接的用户信息
 			System.out.println("New connection accept:" + socket.getInetAddress());
 			try { 
@@ -174,97 +176,69 @@ public class FtServer implements FangTangConstants{
 						case 3:{
 								users.forEach( (k,v)->{
 								try {
-									toClient.writeUTF("user id: "+ v);
+//									int count = 0; count++;// 里面不能修改变量
+									toClient.writeUTF("在线用户 id: "+ v);
 								} catch (IOException e) {
 									e.printStackTrace();
 								} // lambda 
 							});// print all user from the hashmap
 							break;
 						}
-						
-						default:
-									
+						case 4: {
+							toClient.writeUTF("请输入私信人的id：");
+							int fid = Integer.valueOf(fromClient.readUTF());	//查找map中匹配的socket，与之建立通信
+							Socket temp = null;//已修复用户不存在的处理逻辑
+							String msg;
+							for(Map.Entry<Socket,Integer> mapEntry : users.entrySet()){
+								if(mapEntry.getValue().equals(fid)) {
+									isExist=true;
+									System.out.println(isExist);
+									temp = mapEntry.getKey();// 找到对应的socket
+								}
+							}	
+							System.out.println(temp);
+							if (isExist){
+								toClient.writeUTF("可以开始给对方发送私信! ");
+								isExist=false;//私信后有一方用户离开，另一方未知，仍然发信息而未收到回复，未处理这种情况
+								while ((msg = fromClient.readUTF() ) != null){
+									if (!msg.equals("E")&&!isLeaved(fid)) {
+										sendToOne(msg,localName,temp);//continue send
+										System.out.println("已经发送msg！");
+									}
+									else if (isLeaved(fid)){
+										toClient.writeUTF("对方已经离开，已断开连接！");
+										System.out.println(fid+"已经离开，已断开连接！");
+										break;
+									}
+									else{
+										toClient.writeUTF("您已退出私信模式！");
+										System.out.println("已退出私信模式！");
+										break;
+									}
+								}
+							}
+							else toClient.writeUTF("用户不存在！");
+							break;
+						}
+						case 5:{ // group chat
+							toClient.writeUTF("您已进入群聊。");
+							String msg;
+							while ((msg = fromClient.readUTF() )!=null){
+								if (!msg.equals("E")&&users.size()!=1)
+									sendToMembers(msg,localName,socket);// continue send
+								else if (users.size()==1){
+									toClient.writeUTF("当前群聊无其他用户在线，已自动退出！");
+									break;
+								}
+								else {
+									toClient.writeUTF("您已退出群组聊天室！");
+									break;
+								}
+							}
+						}
+						default:	toClient.writeUTF("输入命令功能    (1)L(list):查看当前上线用户;(2)G(group):进入群聊;(3)O(one-one):私信;(4)E(exit):退出当前聊天状态;(5)bye:离线;(6)H(help):帮助");	
 					}  
 				}
-//				//下面这些太冗长了, 怎么处理?
-//				String msg = null;
-//			
-//				while ((msg = fromClient.readUTF() ) != null) {
-//					switch (msg.trim().toUpperCase()){
-//						case "BYE": {// exit
-//							dout.writeUTF("From 服务器：服务器已断开连接，结束服务！");
-//								sendToMembers("已经下线", localName, socket);
-//								System.out.println("客户端离开。");
-//								break;
-//							}
-//						case "H":{// show help 
-//							dout.writeUTF("input command function");
-//							continue;
-//						}
-//						case "L":{ // show all the member
-//							users.forEach( (k,v)->{
-//								try {
-//									dout.writeUTF("user: "+ v);
-//								} catch (IOException e) {
-//									// TODO Auto-generated catch block
-//									e.printStackTrace();
-//								} // lambda 
-//							});// print all user from the hashmap
-//							continue;
-//						}
-//						case "O":{ // send to one 
-//							dout.writeUTF("请输入私信人的用户名：");
-//							String name = fromClient.readUTF();
-//							//查找map中匹配的socket，与之建立通信
-//							users.forEach((k, v)->{
-//								if (v.equals(name)) {
-//									isExist=true;//全局变量与线程修改问题
-//								}
-//							});
-//
-//							Socket temp = null;//已修复用户不存在的处理逻辑
-//							for(Map.Entry<Socket,String> mapEntry : users.entrySet()){
-//								if(mapEntry.getValue().equals(name))
-//									temp = mapEntry.getKey();
-//							}
-//							if (isExist){
-//								isExist=false;//私信后有一方用户离开，另一方未知，仍然发信息而未收到回复，未处理这种情况
-//								while ((msg = fromClient.readUTF() ) != null){
-//									if (!msg.equals("E")&&!isLeaved(temp))
-//										sendToOne(msg,localName,temp);//continue send
-//									else if (isLeaved(temp)){
-//										dout.writeUTF("对方已经离开，已断开连接！");
-//										break;
-//									}
-//									else{
-//										dout.writeUTF("您已退出私信模式！");
-//										break;
-//									}
-//								}
-//							}
-//							else dout.writeUTF("用户不存在！");
-//							break;
-//						}
-//						case "G":{ // group chat
-//							dout.writeUTF("您已进入群聊。");
-//							while ((msg = fromClient.readUTF() )!=null){
-//								if (!msg.equals("E")&&users.size()!=1)
-//									sendToMembers(msg,localName,socket);// continue send
-//								else if (users.size()==1){
-//									dout.writeUTF("当前群聊无其他用户在线，已自动退出！");
-//									break;
-//								}
-//								else {
-//									dout.writeUTF("您已退出群组聊天室！");
-//									break;
-//								}
-//							}
-//						}
-//						default: dout.writeUTF("please input ");
-//					}
-//					dout.writeUTF("From 服务器：" + msg);
-//					dout.writeUTF("来自服务器,重复消息："+msg);
-//				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
@@ -316,7 +290,6 @@ public class FtServer implements FangTangConstants{
 		while (iterator.hasNext()){
 			Map.Entry entry=(Map.Entry) iterator.next();
 			Socket tempSocket = (Socket) entry.getKey();
-			//String name = (String) entry.getValue();
 			if (tempSocket.equals(another)){
 				out = tempSocket.getOutputStream();
 				DataOutputStream dout = new DataOutputStream(out);

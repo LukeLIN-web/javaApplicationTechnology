@@ -304,12 +304,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			}
 		}
 	}
-	private void waitForSendAction() throws InterruptedException, IOException {
-		while (waiting) {
-			Thread.sleep(100);
-		}
-		waiting = true;
-	}
+
 	private void exit() throws InterruptedException, IOException {
 			Thread.sleep(1000);//多线程等待，关闭窗口时还有线程等待IO，设置1s间隔保证所有线程已关闭
 			close();
