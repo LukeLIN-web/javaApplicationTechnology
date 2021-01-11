@@ -91,7 +91,12 @@ public class FtServer implements FangTangConstants{
 						users.remove(socket);
 						return 1;
 					}
-				
+				case "H":{// show help 
+					return 2;
+				}
+				case "L":{// show help 
+					return 3;
+				}
 				default : return 99;
 			}
 		}
@@ -154,13 +159,26 @@ public class FtServer implements FangTangConstants{
 					System.out.println(socket);
 					System.out.println("服务器收到信息 = "+message+" 来自: "+users.get(socket));//第二个执行
 					toClient.writeUTF("\n收到的信息 = "+message+"来自"+localName+"\n");//第三个执行
-					//int InfoType = fromClient.readInt();//目前先做群聊,
 					int tag = responseSentence(message);
 					switch (tag) {
 						case 1: {
 							toClient.writeUTF("From 服务器：服务器已断开连接，结束服务！");//然后在客户端可以开启重新登录, 可能以后再做.功能是做不完的.2021年1月11日.
 							fromClient.close();
 							toClient.close();
+							break;
+						}
+						case 2:{
+							toClient.writeUTF("输入命令功能    (1)L(list):查看当前上线用户;(2)G(group):进入群聊;(3)O(one-one):私信;(4)E(exit):退出当前聊天状态;(5)bye:离线;(6)H(help):帮助");
+							break;
+						}
+						case 3:{
+								users.forEach( (k,v)->{
+								try {
+									toClient.writeUTF("user id: "+ v);
+								} catch (IOException e) {
+									e.printStackTrace();
+								} // lambda 
+							});// print all user from the hashmap
 							break;
 						}
 						
