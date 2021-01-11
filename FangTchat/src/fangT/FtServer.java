@@ -125,8 +125,7 @@ public class FtServer implements FangTangConstants{
 						}// 失败了, 服务器要转发一个信息回去把连接按钮enable
 						else {
 							try {
-								toClient.writeUTF("login in success!  username is "+ftuser.getName(ftid)+"  账号为 "+ftid);
-								// 登录状态为1; 
+								toClient.writeUTF("login in success!  username is "+ftuser.getName(ftid)+"  账号为 "+ftid);// 登录状态为1; 
 							} catch (Exception e) {
 								e.printStackTrace();
 							} 
@@ -134,20 +133,20 @@ public class FtServer implements FangTangConstants{
 					}
 					else if(signal == REGISTER) {
 						System.out.println("\n服务器接收用户名和密码中.... ");
-						toClient.writeInt( CONTINUESEND);
 						username = fromClient.readUTF();
 						password = fromClient.readUTF();
 						System.out.println("收到的用户名和密码为 = "+username+password);
 						if(responseRgstr(username,password) == false) {
 							int id = ftuser.getNewestId();
-							toClient.writeUTF("没有用户名, 注册了一个账户, 用户名为 =    "+username+"账号为 "+id + " 请牢记! 服务器收到的用户名为 =    "+username);
+							toClient.writeUTF("register success,没有用户名, 注册了一个账户, 用户名为 =    "+username+"账号为 "+id + " 请牢记! 服务器收到的用户名为 =    "+username);
+							System.out.println("register success,没有用户名, 注册了一个账户, 用户名为 =    "+username+"账号为 "+id);
 						}
 						else {
-							toClient.writeUTF("用户名"+username+"已经存在, 请重新输入用户名和密码,再次点击注册按钮!  ");
+							toClient.writeUTF("error:用户名"+username+"已经存在, 请重新输入用户名和密码,再次点击注册按钮!  ");
 						}
 					}
 					else {
-						toClient.writeInt(STOPSEND);//如果是其他的话返回错误信息
+						toClient.writeInt(STOPSEND);;//如果是其他的话返回错误信息
 					}
 					if (flag) {
 						sendToMembers("已经上线",  localName,socket);//login in success 这个好难实现, 
@@ -157,7 +156,8 @@ public class FtServer implements FangTangConstants{
 					}
 				}
 				String message = null;
-				while( (message  = fromClient.readUTF() )!= null ) {
+				while( !socket.isClosed()  && fromClient != null) {
+					message  = fromClient.readUTF();
 					System.out.println(socket);
 					System.out.println("服务器收到信息 = "+message+" 来自: "+users.get(socket));//第二个执行
 					toClient.writeUTF("\n收到的信息 = "+message+"来自"+localName+"\n");//第三个执行
@@ -239,6 +239,7 @@ public class FtServer implements FangTangConstants{
 						default:	toClient.writeUTF("输入命令功能    (1)L(list):查看当前上线用户;(2)G(group):进入群聊;(3)O(one-one):私信;(4)E(exit):退出当前聊天状态;(5)bye:离线;(6)H(help):帮助");	
 					}  
 				}
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {

@@ -52,7 +52,6 @@ public class FangTclient extends Application implements FangTangConstants{
 	public void start(Stage primaryStage) { //start()方法传入的Stage对象在JavaFX程序加载时被加载（JavaFX的Stage是顶层容器）
 		adjustStyle(primaryStage);
 		primaryStage.show();
-	// btConn.defaultButtonProperty();
 		btConn.setOnAction(new BtnConnHandler() );
 		btnSend.setOnAction(new BtnSendHandler() );
 		tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
@@ -79,14 +78,12 @@ public class FangTclient extends Application implements FangTangConstants{
 			toServer = new DataOutputStream(socket.getOutputStream());
 			fromServer = new DataInputStream(socket.getInputStream());
 			Platform.runLater( ()->{
-				taDisplay.appendText("	启动客户端成功! 连接服务器成功!!  \n");
+				taDisplay.appendText("	启动客户端成功! 打开socket成功!!  \n");
 			});
-			System.out.print("debug 语句1 ");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
-			System.out.print("debug 语句2 ");
 			int logstatus = fromServer.readInt();//服务器告诉他可以开始了
 			if(logstatus == CONNECTSUCCESS) {
 					Platform.runLater( ()->{
@@ -105,8 +102,7 @@ public class FangTclient extends Application implements FangTangConstants{
 	//接收服务器发来的消息
 	private int receiveInfoFromServer() throws IOException{
 		int currentStatus = fromServer.readInt();
-		if (currentStatus == STOPSEND) {
-			//continueToSend = false;//还是继续尝试登录
+		if (currentStatus == STOPSEND) {//还是继续尝试登录
 			Platform.runLater( ()->{
 				taDisplay.appendText("\n	登录失败!!! \n");
 			});
@@ -202,19 +198,28 @@ public class FangTclient extends Application implements FangTangConstants{
 				toServer.writeInt(REGISTER);//客户端发注册信号
 				toServer.writeUTF(usr);
 				toServer.writeUTF(pwd);
-					Platform.runLater(()->{// 稍后更新GUI
-						LocalDateTime now = LocalDateTime.now();
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
-						taDisplay.appendText(dtf.format(now)+"\n");// format print
-						taDisplay.setStyle("-fx-text-fill:black");
-						taDisplay.appendText("\n");
-						taDisplay.appendText(usr+"希望注册的用户名和密码已经发送！\n");
-					});
-				// btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
+				Platform.runLater(()->{// 稍后更新GUI
+					LocalDateTime now = LocalDateTime.now();
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+					taDisplay.appendText(dtf.format(now)+"\n");// format print
+					taDisplay.setStyle("-fx-text-fill:black");
+					taDisplay.appendText("\n");
+					taDisplay.appendText(usr+"希望注册的用户名和密码已经发送！\n");
+				});	
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			taDisplay.appendText("注册中\n");
+			try {
+				String msg = fromServer.readUTF();
+				Platform.runLater(()->{// 稍后更新GUI
+					LocalDateTime now = LocalDateTime.now();
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+					taDisplay.appendText(dtf.format(now)+"\n");// format print
+					taDisplay.appendText(msg);
+				});	
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			username.clear();
 			REGIpassword.clear();
 		}
@@ -256,7 +261,7 @@ public class FangTclient extends Application implements FangTangConstants{
 									System.out.println("debug 语句5 ");
 								}
 							} catch (IOException e) {
-								e.printStackTrace();
+								System.out.println("这是合法的，循环结束");
 							}
 							Platform.runLater( ()->{
 								taDisplay.appendText("\n收到服务器的循环已经结束 ");});
@@ -282,8 +287,14 @@ public class FangTclient extends Application implements FangTangConstants{
 				e.printStackTrace();
 			}
 			taDisplay.appendText("\n本地客户端发送："+msg+"\n");//第一个执行
-			if (msg.equalsIgnoreCase("bye")) //业务逻辑写在里面, 比较冗长.
-				resetByServerInfo("bye");//退出还应该发送一个消息给ftserver,让他移除掉用户
+			if (msg.equalsIgnoreCase("bye"))
+				try {
+					exit();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					System.out.println("这是合法的，客户端已经关闭");
+				}//让他移除掉用户
 			tfSend.clear();
 		}
 	}
@@ -301,6 +312,14 @@ public class FangTclient extends Application implements FangTangConstants{
 				}
 				taDisplay.appendText("本地客户端发送："+msg+"\n");
 				tfSend.clear();
+				if (msg.equalsIgnoreCase("bye"))
+					try {
+						exit();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						System.out.println("这是合法的，客户端已经关闭");
+					}//让他移除掉用户
 			}
 		}
 	}
