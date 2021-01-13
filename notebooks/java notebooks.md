@@ -224,3 +224,29 @@ containKey()
  Map.entrySet() 这个方法返回的是一个Set<Map.Entry<K,V>>，Map.Entry 是Map中的一个接口，他的用途是表示一个映射项（里面有Key和Value），而Set<Map.Entry<K,V>>表示一个映射项的Set。Map.Entry里有相应的getKey和getValue方法，即JavaBean，让我们能够从一个项中取出Key和Value。
 
 JavaBean 通过提供符合一致性设计模式的公共方法将内部域暴露成员属性，set和get方法获取。众所周知，属性名称符合这种模式，其他Java 类可以通过自省机制(反射机制)发现和操作这些JavaBean 的属性。
+
+#### java多态
+
+现实中，比如我们按下 F1 键这个动作：
+
+- 如果当前在 Flash 界面下弹出的就是 AS 3 的帮助文档；
+- 如果当前在 Word 下弹出的就是 Word 帮助；
+- 在 Windows 下弹出的就是 Windows 帮助和支持。
+
+同一个事件发生在不同的对象上会产生不同的结果。
+
+### 多态的优点
+
+- \1. 消除类型之间的耦合关系
+- \2. 可替换性
+- \3. 可扩充性
+- \4. 接口性
+- \5. 灵活性
+- \6. 简化性
+
+### 多态存在的三个必要条件
+
+- 继承
+- 重写
+- 父类引用指向子类对象：**Parent p = new Child();**
+

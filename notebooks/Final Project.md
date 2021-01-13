@@ -350,6 +350,42 @@ start()中只需要new BtnSendHandler() 即可
 
 Socket write 真的好蠢,每个write read都要自己写, 还是http一个包发过去清楚明白.
 
+]
+
+### Adapter:
+
+类中静态的方法或者属性，本质上来讲并不是该类的成员，在java虚拟机装在类的时候，这些静态的东西已经有了对象，它只是在这个类中”寄居”，不需要通过类的构造器（构造函数）类实现实例化；而***非静态的属性或者方法，在类的装载是并没有存在，需在执行了该类的构造函数后才可依赖该类的实例对象存在。所以在静态方法中调用非静态方法时\***，编译器会报错
+
+main（）函数一定是静态的，没有返回值，形参为数组。
+
+```java
+public class MediaAdapter implements MediaPlayer {
+ 
+   AdvancedMediaPlayer advancedMusicPlayer;
+ 
+   public MediaAdapter(String audioType){
+      if(audioType.equalsIgnoreCase("vlc") ){
+         advancedMusicPlayer = new VlcPlayer();       
+      } else if (audioType.equalsIgnoreCase("mp4")){
+         advancedMusicPlayer = new Mp4Player();
+      }  
+   }
+ //实现多态, 都用
+   @Override
+   public void play(String audioType, String fileName) {
+      if(audioType.equalsIgnoreCase("vlc")){
+         advancedMusicPlayer.playVlc(fileName);
+      }else if(audioType.equalsIgnoreCase("mp4")){
+         advancedMusicPlayer.playMp4(fileName);
+      }
+   }
+}
+```
+
+这样多态, play() 就可以用了. 用户只用play, 不用管,也不管实现, 
+
+![d](https://www.runoob.com/wp-content/uploads/2014/08/20201204-adapter.png)
+
 
 
 #### pre: PPchat 

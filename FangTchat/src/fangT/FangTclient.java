@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -29,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.*;
 
 public class FangTclient extends Application implements FangTangConstants{
+	JFXPanel jfxPanel = new JFXPanel();//否则会有java.lang.RuntimeException: Internal graphics not initialized yet
 	Image imagesend = new Image("envelope.png");
 	private Button btnExit=new Button("退出");  
 	private Button btnSend = new Button("发送",new ImageView(imagesend));
@@ -45,8 +47,8 @@ public class FangTclient extends Application implements FangTangConstants{
 	public  boolean continueToSend = true;
 	public  boolean waiting = true;
 	private Socket socket;
-	public static void main(String[] args) {
-		launch(args);//用来启动整个Application的
+	public void displayIt(){
+		launch();//用来启动整个Application的
 	}
 	@Override
 	public void start(Stage primaryStage) { //start()方法传入的Stage对象在JavaFX程序加载时被加载（JavaFX的Stage是顶层容器）
