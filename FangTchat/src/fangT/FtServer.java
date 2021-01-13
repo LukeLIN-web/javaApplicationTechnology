@@ -131,6 +131,7 @@ public class FtServer implements FangTangConstants{
 							} 
 						}
 					}
+					
 					else if(signal == REGISTER) {
 						System.out.println("\n服务器接收用户名和密码中.... ");
 						username = fromClient.readUTF();
@@ -170,7 +171,8 @@ public class FtServer implements FangTangConstants{
 							break;
 						}
 						case 2:{
-							toClient.writeUTF("输入命令功能    (1)L(list):查看当前上线用户;(2)G(group):进入群聊;(3)O(one-one):私信;(4)E(exit):退出当前聊天状态;(5)bye:离线;(6)H(help):帮助");
+							toClient.writeUTF("输入命令功能\n"
+									+ "(1)L(list):查看当前上线用户;(2)G(group):进入群聊;(3)O(one-one):私信;(4)E(exit):退出当前聊天状态;(5)bye:离线;(6)H(help):帮助");
 							break;
 						}
 						case 3:{

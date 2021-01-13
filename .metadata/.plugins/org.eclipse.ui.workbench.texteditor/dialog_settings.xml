@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="BtnRegstHandler"/>
+		<item key="selection" value="sendToOne"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="BtnRegstHandler"/>
-			<item value="init"/>
-			<item value="localName"/>
-			<item value="sendTo"/>
-			<item value="CONTINUESEND"/>
-			<item value="reveiveMsg()"/>
-			<item value="tcpClient"/>
-			<item value="服务器连接失败！"/>
-			<item value="run"/>
-			<item value="handle"/>
-			<item value="launch"/>
-			<item value="receive"/>
-			<item value="pwd"/>
-			<item value="socket"/>
-			<item value="send"/>
+			<item value="sendToOne"/>
+			<item value="receiveInfoFromServer"/>
+			<item value="btRegst.setDisable"/>
+			<item value="tfSend.setDisable"/>
+			<item value="btConn.setDisable"/>
+			<item value="btnSend.setDisable"/>
+			<item value="resetByServerInfo"/>
+			<item value="btConn.setDisable(true)"/>
+			<item value="msg"/>
+			<item value="启动客户端成功"/>
+			<item value="while"/>
+			<item value="debug 语句5 "/>
+			<item value="isExist"/>
+			<item value="hostName"/>
+			<item value="flag"/>
 		</list>
 		<list key="replacehistory">
 			<item value="dout.writeUTF"/>
@@ -33,8 +33,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="919"/>
-		<item key="DIALOG_Y_ORIGIN" value="689"/>
+		<item key="DIALOG_X_ORIGIN" value="1562"/>
+		<item key="DIALOG_Y_ORIGIN" value="448"/>
 		<item key="DIALOG_WIDTH" value="405"/>
 		<item key="DIALOG_HEIGHT" value="534"/>
 		<item key="DIALOG_FONT_NAME" value="1|Microsoft YaHei UI|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|0|0|Microsoft YaHei UI"/>

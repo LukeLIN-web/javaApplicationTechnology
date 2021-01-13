@@ -88,7 +88,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			if(logstatus == CONNECTSUCCESS) {
 					Platform.runLater( ()->{
 						taDisplay.appendText("	连接成功!!!  欢迎使用服务！\n请输入用户名：\n");});	//remind user to input user name
-					btnSend.setDisable(false);// TODO: 可以开始. 做一些设置。
+
 			} else if (logstatus == CONNECTFAIL) {
 					Platform.runLater( ()->{
 						taDisplay.appendText("	连接失败!!! \n");});					//TODO :重新尝试连接.
@@ -125,10 +125,10 @@ public class FangTclient extends Application implements FangTangConstants{
 		switch( arr[0] ) {
 			case 'l': //登录成功
 				btnSend.setDisable(false);//登录成功,可以发送信息
-				btConn.setDisable(true);//一个客户端登录一个账号,不再登录
+				btConn.setDisable(true);//一个客户端登录一个账号,不再登录,连接服务器之后未结束服务前禁用再次连接
 				btRegst.setDisable(true);//一个客户端登录一个账号,也不再注册.
 				break;
-			case 'f':// 登录失败
+			case 'f':// 登录失败	
 				btnSend.setDisable(true);//登录失败,不可以发送信息
 				break;
 			case 'b':
@@ -225,7 +225,8 @@ public class FangTclient extends Application implements FangTangConstants{
 		}
 	}
 	
-	class BtnConnHandler implements EventHandler<ActionEvent>{ //连接按钮触发的事件原先用lambda函数表示 , now 改写为单独的类
+	//连接按钮触发的事件原先用lambda函数表示 , now 改写为单独的类
+	class BtnConnHandler implements EventHandler<ActionEvent>{ 
 		@Override
 		public void handle(ActionEvent event) {
 			waiting = false;// 打断waiting 的状态. 结束waitForSendAction()
@@ -235,30 +236,21 @@ public class FangTclient extends Application implements FangTangConstants{
 				toServer.writeInt(LOGIN);
 				toServer.writeInt(Integer.parseInt(ftid));
 				toServer.writeUTF(pwd);//发送信息放在按钮事件中
-				System.out.print("debug 语句3 ");
 					Platform.runLater(()->{// 稍后更新GUI
 						LocalDateTime now = LocalDateTime.now();
 						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
 						taDisplay.appendText(dtf.format(now)+"\n");// format print
-						taDisplay.setStyle("-fx-text-fill:red");
 						taDisplay.appendText(ftid+pwd+"用户名和密码已经发送！\n");
 					});
-				//btConn.setDisable(true);	//连接服务器之后未结束服务前禁用再次连接
-				tfSend.setDisable(false);	//重新连接服务器时启用输入发送功能
-				btnSend.setDisable(false);
 				int i = receiveInfoFromServer();
-				if (i == CONTINUESEND) {
-					System.out.print("debug 语句4 ");//登录是严格的协议, 之后接收是多线程的.
-					try {
-						new Thread( () ->{
-							// 进入发送信息循环. 这里可以把用户信息放入map
-							String msg = null;// after login then communicate with server.
-							try {
-								while ((msg = fromServer.readUTF() ) != null) {// 大多数时候停留在这里,等用户按按钮来发送信息.
-									String tmp = msg;
+				if (i == CONTINUESEND) {//登录是严格的协议, 之后接收是多线程的.
+					try {// after login then communicate with server.
+						new Thread( () ->{ // 进入发送信息循环. 这里可以把用户信息放入map
+							try {// 大多数时候停留在这里,等用户按按钮来发送信息.
+								while( !socket.isClosed()  && fromServer != null) {
+									String msg = fromServer.readUTF();
 									Platform.runLater( ()->{
-										taDisplay.appendText("\n收到服务器的消息: "+tmp);});//第四个执行
-									System.out.println("debug 语句5 ");
+										taDisplay.appendText("\n收到服务器的消息: "+msg);});//第四个执行
 								}
 							} catch (IOException e) {
 								System.out.println("这是合法的，循环结束");
