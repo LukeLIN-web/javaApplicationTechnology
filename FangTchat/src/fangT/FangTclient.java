@@ -29,121 +29,24 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 
-public class FangTclient extends Application implements FangTangConstants{
+class baseClient extends Application implements FangTangConstants{
 	JFXPanel jfxPanel = new JFXPanel();//否则会有java.lang.RuntimeException: Internal graphics not initialized yet
 	Image imagesend = new Image("envelope.png");
-	private Button btnExit=new Button("退出");  
-	private Button btnSend = new Button("发送",new ImageView(imagesend));
-	private Button btConn = new Button("登录");
-	private Button btRegst = new Button("注册");
-	private TextField tfSend=new TextField();//输入信息区域
-	private TextArea taDisplay = new TextArea();//显示区域
-	private TextField username = new TextField();//填写用户名
-	private PasswordField LOGINpassword = new PasswordField();//login in 
-	private TextField fangTangId = new TextField();//填写id
-	private PasswordField REGIpassword = new PasswordField();//填写密码
-	private DataInputStream fromServer;
-	private DataOutputStream toServer;
-	public  boolean continueToSend = true;
-	public  boolean waiting = true;
-	private Socket socket;
-	public void displayIt(){
-		launch();//用来启动整个Application的
-	}
-	@Override
-	public void start(Stage primaryStage) { //start()方法传入的Stage对象在JavaFX程序加载时被加载（JavaFX的Stage是顶层容器）
+	protected Button btnExit = new Button("退出");  
+	protected Button btnSend = new Button("发送",new ImageView(imagesend));
+	protected Button btConn = new Button("登录");
+	protected Button btRegst = new Button("注册");
+	protected TextField tfSend = new TextField();//输入信息区域
+	protected TextArea taDisplay = new TextArea();//显示区域
+	protected TextField username = new TextField();//填写用户名
+	protected PasswordField LOGINpassword = new PasswordField();//login in 
+	protected TextField fangTangId = new TextField();//填写id
+	protected PasswordField REGIpassword = new PasswordField();//填写密码
+	public void start(Stage primaryStage) {
 		adjustStyle(primaryStage);
 		primaryStage.show();
-		btConn.setOnAction(new BtnConnHandler() );
-		btnSend.setOnAction(new BtnSendHandler() );
-		tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
-		btRegst.setOnAction(new BtnRegstHandler());
-		btnExit.setOnAction(event -> {
-			try {
-				exit();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
-		});	//窗体关闭响应的事件,点击右上角的×关闭,客户端也关闭
-		primaryStage.setOnCloseRequest(event -> {
-			try {
-				exit();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
-		});
-		connectToserver();// 打开客户端同时连接服务器.
 	}
-	private void connectToserver() {
-		try {
-			socket = new Socket("localhost",port);
-			toServer = new DataOutputStream(socket.getOutputStream());
-			fromServer = new DataInputStream(socket.getInputStream());
-			Platform.runLater( ()->{
-				taDisplay.appendText("	启动客户端成功! 打开socket成功!!  \n");
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			int logstatus = fromServer.readInt();//服务器告诉他可以开始了
-			if(logstatus == CONNECTSUCCESS) {
-					Platform.runLater( ()->{
-						taDisplay.appendText("	连接成功!!!  欢迎使用服务！\n请输入用户名：\n");});	//remind user to input user name
-
-			} else if (logstatus == CONNECTFAIL) {
-					Platform.runLater( ()->{
-						taDisplay.appendText("	连接失败!!! \n");});					//TODO :重新尝试连接.
-			}
-			System.out.print("debug 语句连接成功 ");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	//接收服务器发来的消息
-	private int receiveInfoFromServer() throws IOException{
-		int currentStatus = fromServer.readInt();
-		if (currentStatus == STOPSEND) {//还是继续尝试登录
-			Platform.runLater( ()->{
-				taDisplay.appendText("\n	登录失败!!! \n");
-			});
-			return STOPSEND;
-		}
-		else if(currentStatus == CONTINUESEND){ // 约定好, 先发CONTINUESEND,然后再发字符串.
-			//把接收和事件分离开, 而不是在这里readutf
-			String tmp = fromServer.readUTF();// 阅读服务器的返回消息
-			resetByServerInfo(tmp);// 根据返回信息来设置客户端
-			Platform.runLater( ()->{
-				taDisplay.appendText("fromServer.readUTF()"+tmp);
-			});
-			return CONTINUESEND;
-		}
-		else return STOPSEND;
-	}
-	//更新客户端的按钮等控件, 修改一些变量. 
-	private void resetByServerInfo(String serverInfo){
-		char[] arr = serverInfo.toCharArray();    // char数组
-		switch( arr[0] ) {
-			case 'l': //登录成功
-				btnSend.setDisable(false);//登录成功,可以发送信息
-				btConn.setDisable(true);//一个客户端登录一个账号,不再登录,连接服务器之后未结束服务前禁用再次连接
-				btRegst.setDisable(true);//一个客户端登录一个账号,也不再注册.
-				break;
-			case 'f':// 登录失败	
-				btnSend.setDisable(true);//登录失败,不可以发送信息
-				break;
-			case 'b':
-				btnSend.setDisable(true);//发送bye后禁用发送按钮
-				tfSend.setDisable(true);//禁用Enter发送信息输入区域
-				btConn.setDisable(false);//结束服务后再次启用连接按钮
-				break;
-			default :
-				taDisplay.appendText("\n客户端更新完毕! \n");
-		}	
-	}
-	
-	// 把前端的工作分离出start();
+	// 把前端的工作分离出start();使用baseClient父类作为UI调整, 这样可以通过同样的UI写别的业务代码.
 	public void adjustStyle(Stage primaryStage) {
 		BorderPane mainPane=new BorderPane();//BorderPane，默认就分割好了上下左右中的五个部分
 		
@@ -189,6 +92,112 @@ public class FangTclient extends Application implements FangTangConstants{
 		primaryStage.setTitle("FangTangChatRoom");// Set the stage title
 		primaryStage.getIcons().add(new Image("LOGO2.png"));//Stage相当于swing的Jwindow,一个Stage必须至少有一个Scene.Scene相当于JFrame,包含一个或者多个node节点
 	}
+}
+
+public class FangTclient extends baseClient{
+	private Socket socket;
+	private DataInputStream fromServer;
+	private DataOutputStream toServer;
+	public  boolean continueToSend = true;
+	public  boolean waiting = true;
+	LocalDateTime now = LocalDateTime.now();
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+	public void displayIt(){
+		launch();//用来启动整个Application
+	}
+	@Override
+	public void start(Stage primaryStage) { //start()方法传入的Stage对象在JavaFX程序加载时被加载（JavaFX的Stage是顶层容器）
+		super.start(primaryStage);
+		btConn.setOnAction(new BtnConnHandler() );
+		btnSend.setOnAction(new BtnSendHandler() );
+		tfSend.setOnKeyPressed(new PressSendHandler() );	//对输入区域绑定键盘事件
+		btRegst.setOnAction(new BtnRegstHandler());
+		btnExit.setOnAction(event -> {
+			try {
+				exit();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		});	//窗体关闭响应的事件,点击右上角的×关闭,客户端也关闭
+		primaryStage.setOnCloseRequest(event -> {
+			try {
+				exit();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		});
+		connectToserver();// 打开客户端同时连接服务器.
+	}
+	private void connectToserver() {
+		try {
+			socket = new Socket("localhost",port);
+			toServer = new DataOutputStream(socket.getOutputStream());
+			fromServer = new DataInputStream(socket.getInputStream());
+			Platform.runLater( ()->{
+				taDisplay.appendText("	启动客户端成功! 打开socket成功!!  \n");
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			int logstatus = fromServer.readInt();//服务器告诉他可以开始了
+			if(logstatus == CONNECTSUCCESS) {
+					Platform.runLater( ()->{
+						taDisplay.appendText("	连接成功!!!  欢迎使用服务！\n请输入用户名：\n");});	//remind user to input user name
+			} else if (logstatus == CONNECTFAIL) {
+					Platform.runLater( ()->{
+						taDisplay.appendText("	连接失败!!! \n");});					//TODO :重新尝试连接.
+			}
+			System.out.print("debug 语句连接成功 ");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//接收服务器发来的消息
+	private int receiveInfoFromServer() throws IOException{
+		int currentStatus = fromServer.readInt();
+		if (currentStatus == STOPSEND) {//还是继续尝试登录
+			Platform.runLater( ()->{
+				taDisplay.appendText("\n	登录失败!!! \n");
+			});
+			return STOPSEND;
+		}
+		else if(currentStatus == CONTINUESEND){ // 约定好, 先发CONTINUESEND,然后再发字符串.
+			//把接收和事件分离开, 而不是在这里readutf
+			String tmp = fromServer.readUTF();// 阅读服务器的返回消息
+			resetByServerInfo(tmp);// 根据返回信息来设置客户端
+			Platform.runLater( ()->{
+				taDisplay.appendText(dtf.format(now)+"\n");// format print
+				taDisplay.appendText("收到服务器的信息:  "+tmp+"\n");
+			});
+			return CONTINUESEND;
+		}
+		else return STOPSEND;
+	}
+	
+	//更新客户端的按钮等控件, 修改一些变量. 
+	private void resetByServerInfo(String serverInfo){
+		char[] arr = serverInfo.toCharArray();    // char数组
+		switch( arr[0] ) {
+			case 'l': //登录成功
+				btnSend.setDisable(false);//登录成功,可以发送信息
+				btConn.setDisable(true);//一个客户端登录一个账号,不再登录,连接服务器之后未结束服务前禁用再次连接
+				btRegst.setDisable(true);//一个客户端登录一个账号,也不再注册.
+				break;
+			case 'f':// 登录失败	
+				btnSend.setDisable(true);//登录失败,不可以发送信息
+				break;
+			case 'b':
+				btnSend.setDisable(true);//发送bye后禁用发送按钮
+				tfSend.setDisable(true);//禁用Enter发送信息输入区域
+				btConn.setDisable(false);//结束服务后再次启用连接按钮
+				break;
+			default :
+				taDisplay.appendText("\n客户端更新完毕! \n");
+		}	
+	}
+	
 	// 按下注册按钮, 发送用户密码到服务器, 服务器去数据库找是否对应,如果有,那就显示已存在用户名,  如果不对应,那就add 这个. 显示注册成功. 
 	class BtnRegstHandler implements EventHandler<ActionEvent>{
 		@Override
@@ -201,11 +210,8 @@ public class FangTclient extends Application implements FangTangConstants{
 				toServer.writeUTF(usr);
 				toServer.writeUTF(pwd);
 				Platform.runLater(()->{// 稍后更新GUI
-					LocalDateTime now = LocalDateTime.now();
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+					now = LocalDateTime.now();
 					taDisplay.appendText(dtf.format(now)+"\n");// format print
-					taDisplay.setStyle("-fx-text-fill:black");
-					taDisplay.appendText("\n");
 					taDisplay.appendText(usr+"希望注册的用户名和密码已经发送！\n");
 				});	
 			} catch (IOException e) {
@@ -214,8 +220,7 @@ public class FangTclient extends Application implements FangTangConstants{
 			try {
 				String msg = fromServer.readUTF();
 				Platform.runLater(()->{// 稍后更新GUI
-					LocalDateTime now = LocalDateTime.now();
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+					now = LocalDateTime.now();
 					taDisplay.appendText(dtf.format(now)+"\n");// format print
 					taDisplay.appendText(msg);
 				});	
@@ -239,8 +244,7 @@ public class FangTclient extends Application implements FangTangConstants{
 				toServer.writeInt(Integer.parseInt(ftid));
 				toServer.writeUTF(pwd);//发送信息放在按钮事件中
 					Platform.runLater(()->{// 稍后更新GUI
-						LocalDateTime now = LocalDateTime.now();
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") ;
+						now = LocalDateTime.now();
 						taDisplay.appendText(dtf.format(now)+"\n");// format print
 						taDisplay.appendText(ftid+pwd+"用户名和密码已经发送！\n");
 					});
@@ -252,6 +256,8 @@ public class FangTclient extends Application implements FangTangConstants{
 								while( !socket.isClosed()  && fromServer != null) {
 									String msg = fromServer.readUTF();
 									Platform.runLater( ()->{
+										now = LocalDateTime.now();
+										taDisplay.appendText("\n"+dtf.format(now)+"\n");// format print
 										taDisplay.appendText("\n收到服务器的消息: "+msg);});//第四个执行
 								}
 							} catch (IOException e) {
@@ -280,7 +286,8 @@ public class FangTclient extends Application implements FangTangConstants{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			taDisplay.appendText("\n本地客户端发送："+msg+"\n");//第一个执行
+			now = LocalDateTime.now();
+			taDisplay.appendText(dtf.format(now)+"本地客户端发送："+msg+"\n");//第一个执行
 			if (msg.equalsIgnoreCase("bye"))
 				try {
 					exit();
@@ -304,7 +311,8 @@ public class FangTclient extends Application implements FangTangConstants{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				taDisplay.appendText("本地客户端发送："+msg+"\n");
+				now = LocalDateTime.now();
+				taDisplay.appendText(dtf.format(now)+"本地客户端发送："+msg+"\n");
 				tfSend.clear();
 				if (msg.equalsIgnoreCase("bye"))
 					try {

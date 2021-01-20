@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="com.sun.tools.javac.util.Name.Table"/>
     <fullyQualifiedTypeName name="dto.People"/>
     <fullyQualifiedTypeName name="databasebyjava.people"/>
     <fullyQualifiedTypeName name="java.sql.ResultSetMetaData"/>
@@ -9,7 +8,6 @@
     <fullyQualifiedTypeName name="java.sql.Statement"/>
     <fullyQualifiedTypeName name="databasebyjava.t_user"/>
     <fullyQualifiedTypeName name="jdk.internal.jshell.tool.resources.l10n"/>
-    <fullyQualifiedTypeName name="javafx.application.Application"/>
     <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
     <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
     <fullyQualifiedTypeName name="com.sun.tools.javac.code.DeferredCompletionFailureHandler.Handler"/>
@@ -39,7 +37,6 @@
     <fullyQualifiedTypeName name="java.util.Date"/>
     <fullyQualifiedTypeName name="java.io.DataInputStream"/>
     <fullyQualifiedTypeName name="com.sun.net.httpserver.HttpServer"/>
-    <fullyQualifiedTypeName name="fangT.FtServer"/>
     <fullyQualifiedTypeName name="fangT.FangTangConstants"/>
     <fullyQualifiedTypeName name="fangT.Response"/>
     <fullyQualifiedTypeName name="java.io.OutputStream"/>
@@ -56,8 +53,11 @@
     <fullyQualifiedTypeName name="java.net.Socket"/>
     <fullyQualifiedTypeName name="java.lang.String"/>
     <fullyQualifiedTypeName name="java.lang.System"/>
-    <fullyQualifiedTypeName name="fangT.FangTclient"/>
     <fullyQualifiedTypeName name="fangT.MyClient"/>
     <fullyQualifiedTypeName name="fangT.Myclient"/>
     <fullyQualifiedTypeName name="javafx.embed.swing.JFXPanel"/>
+    <fullyQualifiedTypeName name="javafx.application.Application"/>
+    <fullyQualifiedTypeName name="fangT.baseClient"/>
+    <fullyQualifiedTypeName name="fangT.FangTclient"/>
+    <fullyQualifiedTypeName name="fangT.FtServer"/>
 </qualifiedTypeNameHistroy>

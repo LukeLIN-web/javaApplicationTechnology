@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value=""/>
+		<item key="selection" value="收到服务器的消息: "/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="收到服务器的消息: "/>
+			<item value="收到的信息 ="/>
+			<item value="fromServer.readUTF()"/>
+			<item value="adjustStyle"/>
+			<item value="start"/>
 			<item value="FangTclient()"/>
 			<item value="setchat"/>
 			<item value="sendToOne"/>
@@ -18,11 +23,6 @@
 			<item value="btnSend.setDisable"/>
 			<item value="resetByServerInfo"/>
 			<item value="btConn.setDisable(true)"/>
-			<item value="msg"/>
-			<item value="启动客户端成功"/>
-			<item value="while"/>
-			<item value="debug 语句5 "/>
-			<item value="isExist"/>
 		</list>
 		<list key="replacehistory">
 			<item value="dout.writeUTF"/>

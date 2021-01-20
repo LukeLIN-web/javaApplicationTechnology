@@ -9,23 +9,24 @@ import java.util.concurrent.*;//实现线程安全.
 //import java.util.concurrent.ExecutorService;
 //import java.util.concurrent.Executors;
 public class FtServer implements FangTangConstants{
+	private static FtServer ftServer  = new FtServer();//该类被加载时运行一次
 	private ConcurrentHashMap<Socket,Integer> users = new ConcurrentHashMap<Socket,Integer>();//save user name and socket
 	private int clientNo = 0;//number a client
 	FtUser ftuser = new FtUser();//数据库只有一个,可以用全局变量
 	//匿名内部类和局部内部类在初始化后，又对这个变量进行了赋值。赋值后会认为这个变量不是final了，所以报错
 	public static void main(String[] args){
 			try {
-				new FtServer().Service();
+				ftServer.Service();
 			} catch (IOException e) {
 				e.printStackTrace();// maybe you can show message JoptionPane
 			}
 	}
-	
 	private ServerSocket serverSocket;//定义服务器套接字
 	private ExecutorService executorService = Executors.newCachedThreadPool();
-	public FtServer() throws IOException{		
-		serverSocket = new ServerSocket(port);
-		System.out.println(new Date()+"服务器启动监听在"+port+"端口...");  //constructor init the serversocket
+	public FtServer(){		
+	}
+	public static FtServer getInstance() {
+		return ftServer;//在类外获得唯一实例
 	}
 	// can send and receive
 	class Handler implements Runnable{
@@ -241,7 +242,6 @@ public class FtServer implements FangTangConstants{
 						default:	toClient.writeUTF("输入命令功能    (1)L(list):查看当前上线用户;(2)G(group):进入群聊;(3)O(one-one):私信;(4)E(exit):退出当前聊天状态;(5)bye:离线;(6)H(help):帮助");	
 					}  
 				}
-				
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
@@ -256,6 +256,8 @@ public class FtServer implements FangTangConstants{
 	}
 	//服务器停留在这循环里等待连接.
 	public void Service() throws IOException{
+		serverSocket = new ServerSocket(port);
+		System.out.println(new Date()+"服务器启动监听在"+port+"端口...");  //constructor init the serversocket
 		while(true) {
 			Socket s = null ;
 			s = serverSocket.accept();//等待直到有客户端连接到这个端口,1个监听socket,每次accept成功后返回一个数据socket, 再继续用监听socket监听
