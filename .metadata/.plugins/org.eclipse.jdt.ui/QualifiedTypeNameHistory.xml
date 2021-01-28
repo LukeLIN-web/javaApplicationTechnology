@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="dto.People"/>
     <fullyQualifiedTypeName name="databasebyjava.people"/>
     <fullyQualifiedTypeName name="java.sql.ResultSetMetaData"/>
     <fullyQualifiedTypeName name="java.sql.DatabaseMetaData"/>
@@ -60,4 +59,5 @@
     <fullyQualifiedTypeName name="fangT.baseClient"/>
     <fullyQualifiedTypeName name="fangT.FangTclient"/>
     <fullyQualifiedTypeName name="fangT.FtServer"/>
+    <fullyQualifiedTypeName name="java.util.HashMap"/>
 </qualifiedTypeNameHistroy>
