@@ -8,6 +8,10 @@
 
 简单的爬虫,跟踪特定网页，下载该网页中所有链接的指定内容，去除广告等无关内容，组合成单一文件。主要作广度搜索，深度暂为1。
 
+多线程和并行程序设计 30章 demo代码 在文件 TaskThreadDemo.java中, 可以用来学习
+
+
+
 ## 二 网络服务器
 
 1、.htm/.txt/.java文件：原样文本传送。 
@@ -18,6 +22,10 @@
 首先,写httpserver 类, request封装请求信息的类, response响应请求的类,
 第二步 在webroot中创建ajax.html 文件, 这个网页上有一个button，当点击这个 button 的时候，访问了服务端的 ajax_info.txt.
 第三步 hello.jsp 利用 method="post" , 可以输入账号密码,账号密码不会直接显示在地址栏,可以发送到服务器,密码在服务器端显示.服务器发送login.jsp给客户端,未解析jsp 
+
+
+
+
 
 ## 三 数据库操作
 

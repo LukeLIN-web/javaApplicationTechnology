@@ -274,7 +274,7 @@ printbanner ,继承banner类,实现了需求print接口,
 
 **Iterator模式**
 
-,写一个自己的iterator
+写一个自己的iterator
 
 **模板模式 ,**
 
@@ -315,3 +315,39 @@ builder声明方法, director 类用builder的抽象方法编写文档,不管哪
 有空再看
 
 有空再看
+
+
+
+### 线程
+
+```java
+public static void main(String[] args) {
+    Runnable 
+}
+deposit {
+	semaphore.acquire() 或者lock.lock
+    做完后
+        semaphore .release 或者 unlock
+}
+```
+
+死锁, 一个获得了object1的锁, , 等待object2的锁,, 另一个获得了 object2的锁,等待obj1的锁
+
+怎么避免死锁? 
+
+资源排序, 确保每个线程都按这个顺序来排序.
+
+一个java进程有多个线程, 共享进程的堆和方法区(有的叫元空间)资源, 每个线程有自己的PC, 虚拟机栈, 本地方法栈.线程是进程划分成的更小的运行单位,一个进程在其执行的过程中可以产生多个线程。线程和进程最大的不同在于基本上各进程是独立的，而各线程则不一定，因为同一进程中的线程极有可能会相互影响。线程执行开销小，但不利于资源的管理和保护；而进程正相反。
+
+```mermaid
+graph TB
+新建new -.start.->就绪ready
+就绪ready-.run.->running运行
+running运行-.运行完成.->结束
+running运行 -.join.->等待目标完成
+等待目标完成-..->就绪ready
+
+```
+
+
+
