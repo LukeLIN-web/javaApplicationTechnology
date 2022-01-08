@@ -75,7 +75,6 @@ public class Response {
 				for (String q : allQueries) {
 					q = q.trim();
 					String[] query = q.split(" ");
-//					System.out.println(query[1] + query[2] + query[0] + query.length);
 					if (query.length != 3 || operations.contains(query[1]) == false) {
 						System.out.println("queryFormError...");
 						errcode = 3;
@@ -86,36 +85,25 @@ public class Response {
 						errcode = 4;
 						return;
 					}
-					String condition = "";
-					for (String con : operations) {
-						if (q.indexOf(con) != -1) {
-							if (condition != "") {
-								errcode = 1;
-								System.out.println("more than one condition");
-								return;
-							} else
-								condition = con;
-						}
-					}
+					String condition = query[1];
 					int lineNum = 1;
-					if (condition.equals("==") {
-						int position = -1;
-						if (query[0] != "*") {
-							position = Arrays.binarySearch(colName, query[0]);
-						}
+					int position = -1; // default is "*"
+					if (query[0] != "*") {
+						position = Arrays.binarySearch(colName, query[0]);
+					}
+					if (condition.equals("==")) {
 						while ((line = br.readLine()) != null) {
 							linetmp = line.split(csvSplit);
 							if (position == -1) {
 								for (String data : linetmp) {
-									System.out.println(data+position + lineNum);
+									System.out.println(data + position + lineNum);
 									if (data.equals(query[2])) {
-										
 										res.add(new lineNumString(data, lineNum));
 										break;
 									}
 								}
 							} else {
-								System.out.println(linetmp[position]+position + lineNum);
+								System.out.println(linetmp[position] + position + lineNum);
 								if (linetmp[position].equals(query[2])) {
 									System.out.println("res.add(new lineNumString(data, lineNum))");
 									res.add(new lineNumString(linetmp[position], lineNum));
@@ -123,18 +111,56 @@ public class Response {
 							}
 							lineNum++;
 						}
-					}
-					else if (condition.equals("&=")) {
-						
-						
+					} else if (condition.equals("&=")) {
+						// contain substring
+						while ((line = br.readLine()) != null) {
+							linetmp = line.split(csvSplit);
+							if (position == -1) {
+								for (String data : linetmp) {
+									System.out.println(data + position + lineNum);
+									if (data.contains(query[2])) {
+										res.add(new lineNumString(data, lineNum));
+										break;
+									}
+								}
+							} else {
+								System.out.println(linetmp[position] + position + lineNum);
+								if (linetmp[position].contains(query[2])) {
+									System.out.println("res.add(new lineNumString(data, lineNum))");
+									res.add(new lineNumString(linetmp[position], lineNum));
+								}
+							}
+							lineNum++;
+						}
+					} else if (condition.equals("!=")) {
+						while ((line = br.readLine()) != null) {
+							linetmp = line.split(csvSplit);
+							if (position == -1) {
+								for (String data : linetmp) {
+									System.out.println(data + position + lineNum);
+									if (! data.equals(query[2])) {
+										res.add(new lineNumString(data, lineNum));
+										break;
+									}
+								}
+							} else {
+								System.out.println(linetmp[position] + position + lineNum);
+								if (! linetmp[position].equals(query[2])) {
+									System.out.println("res.add(new lineNumString(data, lineNum))");
+									res.add(new lineNumString(linetmp[position], lineNum));
+								}
+							}
+							lineNum++;
+						}
+					} else {
+
 					}
 				}
 			} else {
-				
 
 			}
-			
-			for(lineNumString lns: res) {
+
+			for (lineNumString lns : res) {
 				System.out.println(lns.str);
 				fos.write(lns.str.getBytes());
 				fos.write("\r\n".getBytes());
