@@ -18,9 +18,9 @@ The browser as a client can access 127.0.0.1:9527.
 | ---- | ---- | ------ | ------ |
 | A    | B    |        | for == |
 | Test | Prod | Hidden | for != |
-| Test | Prod |        | for != |
+| Test |      |        | for != |
 | A    | BA   |        | for &= |
-| Test | pROD |        | for $= |
+|      |      |        | for $= |
 
 
 

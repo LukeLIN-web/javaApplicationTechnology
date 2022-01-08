@@ -85,28 +85,29 @@ public class Response {
 						errcode = 4;
 						return;
 					}
+					query[2] = query[2].replace("\"", "");
 					String condition = query[1];
 					int lineNum = 1;
 					int position = -1; // default is "*"
 					if (query[0] != "*") {
 						position = Arrays.binarySearch(colName, query[0]);
 					}
+					System.out.println( position +condition);
 					if (condition.equals("==")) {
 						while ((line = br.readLine()) != null) {
 							linetmp = line.split(csvSplit);
 							if (position == -1) {
 								for (String data : linetmp) {
-									System.out.println(data + position + lineNum);
 									if (data.equals(query[2])) {
 										res.add(new lineNumString(data, lineNum));
 										break;
 									}
 								}
 							} else {
-								System.out.println(linetmp[position] + position + lineNum);
+								System.out.println(linetmp[position] + query[2] + lineNum);
 								if (linetmp[position].equals(query[2])) {
 									System.out.println("res.add(new lineNumString(data, lineNum))");
-									res.add(new lineNumString(linetmp[position], lineNum));
+									res.add(new lineNumString(line, lineNum));
 								}
 							}
 							lineNum++;
@@ -119,15 +120,13 @@ public class Response {
 								for (String data : linetmp) {
 									System.out.println(data + position + lineNum);
 									if (data.contains(query[2])) {
-										res.add(new lineNumString(data, lineNum));
+										res.add(new lineNumString(line, lineNum));
 										break;
 									}
 								}
 							} else {
-								System.out.println(linetmp[position] + position + lineNum);
 								if (linetmp[position].contains(query[2])) {
-									System.out.println("res.add(new lineNumString(data, lineNum))");
-									res.add(new lineNumString(linetmp[position], lineNum));
+									res.add(new lineNumString(line, lineNum));
 								}
 							}
 							lineNum++;
@@ -146,20 +145,36 @@ public class Response {
 							} else {
 								System.out.println(linetmp[position] + position + lineNum);
 								if (! linetmp[position].equals(query[2])) {
-									System.out.println("res.add(new lineNumString(data, lineNum))");
-									res.add(new lineNumString(linetmp[position], lineNum));
+									res.add(new lineNumString(line, lineNum));
 								}
 							}
 							lineNum++;
 						}
-					} else {
-
+					} else if(condition.equals("$=")){
+						// $= not sensitive.
+						while ((line = br.readLine()) != null) {
+							linetmp = line.split(csvSplit);
+							if (position == -1) {
+								for (String data : linetmp) {
+									System.out.println(data + position + lineNum);
+									if (data.toLowerCase().equals(query[2].toLowerCase())) {
+										res.add(new lineNumString(data, lineNum));
+										break;
+									}
+								}
+							} else {
+								System.out.println(linetmp[position] + position + lineNum);
+								if ( linetmp[position].toLowerCase().equals(query[2].toLowerCase())) {
+									res.add(new lineNumString(line, lineNum));
+								}
+							}
+							lineNum++;
+						}
 					}
 				}
 			} else {
 
 			}
-
 			for (lineNumString lns : res) {
 				System.out.println(lns.str);
 				fos.write(lns.str.getBytes());
@@ -221,13 +236,13 @@ public class Response {
 		FileInputStream fis = new FileInputStream(outputcsv);
 		try {
 			int readLength;
-//			if (errcode == 0) {
-//				output.write("HTTP/1.1 200 OK\n".getBytes());
-//				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
-//				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
-//					output.write(buffer, 0, readLength);
-//				}
-//			}
+			if (errcode == 0) {
+				output.write("HTTP/1.1 200 OK\n".getBytes());
+				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
+				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
+					output.write(buffer, 0, readLength);
+				}
+			}
 			if (errcode == -1) {
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n"
 						+ "Content-Length: 23\r\n" + "\r\n" + "<h1>Data File Not Found</h1>";

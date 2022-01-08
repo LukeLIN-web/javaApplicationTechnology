@@ -22,7 +22,7 @@ public class HttpServer {
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(SERVER_PORT);
-            System.out.println("server listen at"+SERVER_PORT+"port...");
+            System.out.println("server listen at "+SERVER_PORT+" port...");
         }
         catch (Exception e) {
             e.printStackTrace();
