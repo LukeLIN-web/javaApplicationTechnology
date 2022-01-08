@@ -64,9 +64,11 @@ The browser as a client can access 127.0.0.1:9527.
 
 2. when content including `<C1`,  browser can not receive any http data.
 
-   I tried `&lt;`.  and use content.length() to specify length instead of  100. It worked.
+   I tried `&lt;`.  and use `content.length()` to specify length instead of  100. It worked.
 
 3. I learned that we could use File class `createTempFile` `temp.deleteOnExit()`method and then we don't manually delete so many files.
+
+4. We could self define `Treeset` comparable to sort and distinguish.
 
    
 
