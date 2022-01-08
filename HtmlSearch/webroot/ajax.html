@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script>
+function loadXMLDoc() {
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+//在这个网页上有一个button，当点击这个 button 的时候，就会调用 loadXMLDoc。在这个方法里，创建了一个XMLHttpRequest，通过这个对象的open方法，访问了服务端的 ajax_info.txt，
+//当数据返回的时候，就会调用一个匿名函数，来设置网页内容。注意看一下上面代码中的注释。
+
+        // 当数据返回以后才会调用这个匿名方法，把从服务端得到的内容设置到myDiv这个标签里
+	xmlhttp.onreadystatechange=function()
+	{
+		if (xmlhttp.readyState==4 && xmlhttp.status==200)
+		{
+			document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+		}
+	}
+	xmlhttp.open("GET","ajax_info.txt",true);
+	xmlhttp.send();
+}
+</script>
+</head>
+<body>
+
+<div id="myDiv">使用 AJAX 修改文本内容</div>
+<button type="button" onclick="loadXMLDoc()">change text</button>
+
+</body>
+</html>
