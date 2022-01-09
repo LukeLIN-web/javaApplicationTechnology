@@ -48,12 +48,6 @@ The browser as a client can access 127.0.0.1:9527.
 
 
 
-
-
-
-
-
-
 ### Lessons-learnt
 
 1. In  `if (querystr == "queryFormError")` Content-Length = 100, browser can not receive any http data. 

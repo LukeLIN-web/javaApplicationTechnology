@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
-import java.util.regex.Pattern;
 
 public class Response {
 	private static final int BUFFER_SIZE = 1024;
@@ -17,16 +15,15 @@ public class Response {
 	Request request;
 	Set<String> operations;
 	String conju;
-	ArrayList<String> allQueries;
+	String[] allQueries;
 	String headerLine;
 
 	public Response(OutputStream output, Request req) throws IOException {
 		this.output = output;
 		this.request = req;
-		outputcsv = new File(HttpServer.WEB_ROOT + "\\output.csv");
-//		outputcsv = File.createTempFile("tmp-", ".csv");
-//		outputcsv.deleteOnExit();
-		allQueries = new ArrayList<String>();
+//		outputcsv = new File(HttpServer.WEB_ROOT + "\\output.csv");
+		outputcsv = File.createTempFile("tmp-", ".csv");
+		outputcsv.deleteOnExit();
 		operations = new HashSet<String>();
 		operations.add("==");
 		operations.add("!=");
@@ -76,68 +73,17 @@ public class Response {
 			fos.write("\r\n".getBytes());
 			Set<String> colSet = new HashSet<String>(Arrays.asList(colName));
 			TreeSet<lineNumString> res = new TreeSet<lineNumString>();
-			if (conju == "or") {
-				for (String q : allQueries) {
-					String[] query = q.split(" ");
-					if (query.length != 3 || operations.contains(query[1]) == false) {
-						System.out.println("queryFormError...");
-						errcode = 3;
-						return;
-					}
-					if (colSet.contains(query[0]) == false && query[0] != "*") {
-						System.out.println("column name error!");
-						errcode = 4;
-						return;
-					}
-					query[2] = query[2].replace("\"", "");
-					String condition = query[1];
-					int lineNum = 1;
-					int position = -1; // default is "*"
-					if (query[0] != "*") {
-						position = Arrays.binarySearch(colName, query[0]);
-					}
-					while ((line = br.readLine()) != null) {
-						linetmp = line.split(csvSplit);
-						if (position == -1) {
-							for (String data : linetmp) {
-								if (condition.equals("==") && data.equals(query[2])) {
-									res.add(new lineNumString(line, lineNum));
-									break;
-								} else if (condition.equals("&=") && data.contains(query[2])) {
-									res.add(new lineNumString(line, lineNum));
-									break;
-								} else if (condition.equals("!=") && !data.equals(query[2])) {
-									res.add(new lineNumString(line, lineNum));
-									break;
-								} else if (condition.equals("$=")
-										&& data.toLowerCase().equals(query[2].toLowerCase())) {
-									res.add(new lineNumString(line, lineNum));
-									break;
-								}
-							}
-						} else {
-							if (condition.equals("==") && linetmp[position].equals(query[2])) {
-								res.add(new lineNumString(line, lineNum));
-							} else if (condition.equals("&=") && linetmp[position].contains(query[2])) {
-								res.add(new lineNumString(line, lineNum));
-							} else if (condition.equals("!=") && !linetmp[position].equals(query[2])) {
-								res.add(new lineNumString(line, lineNum));
-							} else if (condition.equals("$=")
-									&& linetmp[position].toLowerCase().equals(query[2].toLowerCase())) {
-								res.add(new lineNumString(line, lineNum));
-							}
-						}
-						lineNum++;
-					}
-				}
-			} else {
-				int lineNum = 1;
-				// conjunctions are all "and"
-				while ((line = br.readLine()) != null) {
-					linetmp = line.split(csvSplit);
+			int lineNum = 1;
+
+			// conjunctions mixed "and" "or"
+			while ((line = br.readLine()) != null) {
+				linetmp = line.split(csvSplit);
+				for (String queryContainAnd : allQueries) {
 					boolean flag = true;
-					for (String q : allQueries) {
-						String[] query = q.split(" ");
+					String[] queries = queryContainAnd.trim().split("and");
+					// if all simple query in queries are true, we write this line in result set.
+					for (String simpleQuery : queries) {
+						String[] query = simpleQuery.trim().split(" ");
 						if (query.length != 3 || operations.contains(query[1]) == false) {
 							System.out.println("queryFormError...");
 							errcode = 3;
@@ -165,10 +111,11 @@ public class Response {
 									flag = false;
 								} else if (condition.equals("$=")
 										&& data.toLowerCase().equals(query[2].toLowerCase())) {
-									any = true ;
+									any = true;
 								}
 							}
-							if (any == false && !condition.equals("!=") ) flag = false;
+							if (any == false && !condition.equals("!="))
+								flag = false;
 						} else {
 							if (condition.equals("==") && !linetmp[position].equals(query[2])) {
 								flag = false;
@@ -188,9 +135,10 @@ public class Response {
 					lineNum++;
 				}
 			}
+
 			for (lineNumString lns : res) {
 				System.out.println(lns.str);
-				fos.write(lns.str.getBytes());
+				fos.write((lns.lineNum +" "+lns.str).getBytes());
 				fos.write("\r\n".getBytes());
 			}
 			fos.write("\r\n".getBytes());
@@ -205,27 +153,13 @@ public class Response {
 		FileInputStream fis = null;
 		// process query and write into file
 		String querystr = request.getUri();
-		System.out.println(querystr);
-		// split "and" "or"
-		String[] temp1;
-		if (querystr.indexOf("and") == -1) {
-			if (querystr.indexOf("or") == -1) {
-				allQueries.add(querystr.trim());
-			} else {
-				conju = "or";
-				temp1 = querystr.split("or"); // 分割字符串
-				for (String s : temp1)
-					allQueries.add(s.trim());
-			}
+
+		// split "or"
+		if (querystr.indexOf("or") == -1) {
+			allQueries = new String[1];
+			allQueries[0] = querystr.trim();
 		} else {
-			if (querystr.indexOf("or") == -1) {
-				conju = "and";
-				temp1 = querystr.split("and"); // 分割字符串
-				for (String s : temp1)
-					allQueries.add(s.trim());
-			} else {
-				errcode = 2;
-			}
+			allQueries = querystr.split("or");
 		}
 		System.out.println(allQueries);
 	}
@@ -263,21 +197,23 @@ public class Response {
 			}
 			if (errcode == 3) {
 				String content = "<h1>Query From error! Available operations are following:</h1>\r\n"
-						+ "<h2>&= , != , == , $= </h2>\r\n "+"<h2>You need input exactly one space between operations </h2>\r\n ";
+						+ "<h2>&= , != , == , $= </h2>\r\n "
+						+ "<h2>You need input exactly one space between operations </h2>\r\n"
+						+ "<h2>Notice: You need to put double quotes around value</h2>\r\n";
 				int totallength = content.length();
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
 						+ totallength + "\r\n" + "\r\n" + content;
 				output.write(errMsg.getBytes());
 			}
 			if (errcode == 4) {
-				String content = "<h1>Property does not exist! Available Properties are following:</h1>\r\n <h2>"+headerLine + "</h2>\r\n " ;
+				String content = "<h1>Property does not exist! Available Properties are following:</h1>\r\n <h2>"
+						+ headerLine + "</h2>\r\n ";
 				int totallength = content.length();
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
 						+ totallength + "\r\n" + "\r\n" + content;
 				output.write(errMsg.getBytes());
 			}
 		} catch (Exception e) {
-			
 			e.printStackTrace();
 		} finally {
 			if (fis != null) {
