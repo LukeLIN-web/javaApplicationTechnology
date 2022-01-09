@@ -4,6 +4,8 @@
 
 The browser as a client can access 127.0.0.1:9527.
 
+At first it can process all "and" or all "or" query, I want to improve it so that it can process "and"  "or" mixed query.  "and" has higher precedence.
+
 #### Example using
 
 `127.0.0.1:9527/?query=<C1 == "A" or C2 &= "B" >`
@@ -39,10 +41,10 @@ The browser as a client can access 127.0.0.1:9527.
 | 2    | both "or" "and" appear in query           |
 | 3    | query form error                          |
 | 4    | column name error, send .csv file as hint |
-| 5    |                                           |
-| 6    |                                           |
-| 7    |                                           |
-| 8    |                                           |
+| 5    | for future use                            |
+| 6    | for future use                            |
+| 7    | for future use                            |
+| 8    | for future use                            |
 | 0    | success                                   |
 | -1   | don't have data                           |
 

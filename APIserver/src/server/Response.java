@@ -165,10 +165,11 @@ public class Response {
 									flag = false;
 								} else if (condition.equals("$=")
 										&& data.toLowerCase().equals(query[2].toLowerCase())) {
-									any = true ;
+									any = true;
 								}
 							}
-							if (any == false && !condition.equals("!=") ) flag = false;
+							if (any == false && !condition.equals("!="))
+								flag = false;
 						} else {
 							if (condition.equals("==") && !linetmp[position].equals(query[2])) {
 								flag = false;
@@ -250,11 +251,11 @@ public class Response {
 		try {
 			int readLength;
 			if (errcode == 0) {
-//				output.write("HTTP/1.1 200 OK\n".getBytes());
-//				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
-//				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
-//					output.write(buffer, 0, readLength);
-//				}
+				output.write("HTTP/1.1 200 OK\n".getBytes());
+				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
+				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
+					output.write(buffer, 0, readLength);
+				}
 			}
 			if (errcode == -1) {
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n"
@@ -263,21 +264,22 @@ public class Response {
 			}
 			if (errcode == 3) {
 				String content = "<h1>Query From error! Available operations are following:</h1>\r\n"
-						+ "<h2>&= , != , == , $= </h2>\r\n "+"<h2>You need input exactly one space between operations </h2>\r\n ";
+						+ "<h2>&= , != , == , $= </h2>\r\n "
+						+ "<h2>You need input exactly one space between operations </h2>\r\n ";
 				int totallength = content.length();
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
 						+ totallength + "\r\n" + "\r\n" + content;
 				output.write(errMsg.getBytes());
 			}
 			if (errcode == 4) {
-				String content = "<h1>Property does not exist! Available Properties are following:</h1>\r\n <h2>"+headerLine + "</h2>\r\n " ;
+				String content = "<h1>Property does not exist! Available Properties are following:</h1>\r\n <h2>"
+						+ headerLine + "</h2>\r\n ";
 				int totallength = content.length();
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
 						+ totallength + "\r\n" + "\r\n" + content;
 				output.write(errMsg.getBytes());
 			}
 		} catch (Exception e) {
-			
 			e.printStackTrace();
 		} finally {
 			if (fis != null) {
