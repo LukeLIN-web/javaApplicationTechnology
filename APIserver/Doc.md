@@ -70,5 +70,13 @@ The browser as a client can access 127.0.0.1:9527.
 
 4. We could self define `Treeset` comparable to sort and distinguish.
 
+4. It is difficult to deal with `* match`,  `* != "Hidden"` is ambiguous, does it return true if any column is not equal to "Hidden", or does it return true when all columns are not equal to "Hidden"?
+   I define that all columns are not equal to hidden returns true.
+   
    
 
+Success screenshot
+
+![image-20220109114000776](C:\Users\12638\AppData\Roaming\Typora\typora-user-images\image-20220109114000776.png)
+
+![image-20220109113900693](C:\Users\12638\AppData\Roaming\Typora\typora-user-images\image-20220109113900693.png)

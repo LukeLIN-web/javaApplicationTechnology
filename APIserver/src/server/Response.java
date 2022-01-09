@@ -134,7 +134,7 @@ public class Response {
 				// conjunctions are all "and"
 				while ((line = br.readLine()) != null) {
 					linetmp = line.split(csvSplit);
-					int flag = 0;
+					boolean flag = true;
 					for (String q : allQueries) {
 						String[] query = q.split(" ");
 						if (query.length != 3 || operations.contains(query[1]) == false) {
@@ -154,32 +154,34 @@ public class Response {
 							position = Arrays.binarySearch(colName, query[0]);
 						}
 						if (position == -1) {
+							boolean any = false;
 							for (String data : linetmp) {
 								if (condition.equals("==") && data.equals(query[2])) {
-									flag++;
+									any = true;
 								} else if (condition.equals("&=") && data.contains(query[2])) {
-									flag++;
-								} else if (condition.equals("!=") && !data.equals(query[2])) {
-									flag++;
+									any = true;
+								} else if (condition.equals("!=") && data.equals(query[2])) {
+									flag = false;
 								} else if (condition.equals("$=")
 										&& data.toLowerCase().equals(query[2].toLowerCase())) {
-									flag++;
+									any = true ;
 								}
 							}
+							if (any == false && !condition.equals("!=") ) flag = false;
 						} else {
-							if (condition.equals("==") && linetmp[position].equals(query[2])) {
-								flag++;
-							} else if (condition.equals("&=") && linetmp[position].contains(query[2])) {
-								flag++;
-							} else if (condition.equals("!=") && !linetmp[position].equals(query[2])) {
-								flag++;
+							if (condition.equals("==") && !linetmp[position].equals(query[2])) {
+								flag = false;
+							} else if (condition.equals("&=") && !linetmp[position].contains(query[2])) {
+								flag = false;
+							} else if (condition.equals("!=") && linetmp[position].equals(query[2])) {
+								flag = false;
 							} else if (condition.equals("$=")
-									&& linetmp[position].toLowerCase().equals(query[2].toLowerCase())) {
-								flag++;
+									&& !linetmp[position].toLowerCase().equals(query[2].toLowerCase())) {
+								flag = false;
 							}
 						}
 					}
-					if(flag == allQueries.size()) {
+					if (flag == true) {
 						res.add(new lineNumString(line, lineNum));
 					}
 					lineNum++;
@@ -247,11 +249,11 @@ public class Response {
 		try {
 			int readLength;
 			if (errcode == 0) {
-				output.write("HTTP/1.1 200 OK\n".getBytes());
-				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
-				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
-					output.write(buffer, 0, readLength);
-				}
+//				output.write("HTTP/1.1 200 OK\n".getBytes());
+//				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
+//				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
+//					output.write(buffer, 0, readLength);
+//				}
 			}
 			if (errcode == -1) {
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n"
