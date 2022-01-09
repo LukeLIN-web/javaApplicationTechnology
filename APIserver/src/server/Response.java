@@ -198,8 +198,12 @@ public class Response {
 			if (errcode == 3) {
 				String content = "<h1>Query From error! Available operations are following:</h1>\r\n"
 						+ "<h2>&= , != , == , $= </h2>\r\n "
+<<<<<<< HEAD
 						+ "<h2>You need input exactly one space between operations </h2>\r\n"
 						+ "<h2>Notice: You need to put double quotes around value</h2>\r\n";
+=======
+						+ "<h2>You need input exactly one space between operations </h2>\r\n ";
+>>>>>>> master
 				int totallength = content.length();
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
 						+ totallength + "\r\n" + "\r\n" + content;
