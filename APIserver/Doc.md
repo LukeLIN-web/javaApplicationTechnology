@@ -12,6 +12,8 @@ At first it can process all "and" or all "or" query, I want to improve it so tha
 
 `127.0.0.1:9527/?query=<C1 == "Test" and * $= "Prod" and * != "Hidden" >`
 
+`C1 == "weest"  or  * != "Hidden"  and * $= "Prod" or C3 != "0"`
+
 
 
 #### test case
