@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="start"/>
+		<item key="selection" value="allQueries"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="column name error!"/>
+			<item value="allQueries"/>
+			<item value="linetmp[position]"/>
+			<item value="searching csv..."/>
+			<item value="readLength"/>
+			<item value="queryFormError"/>
+			<item value="setRequest"/>
 			<item value="start"/>
 			<item value="tfSend"/>
 			<item value="信息显示"/>
@@ -16,15 +23,9 @@
 			<item value="ChatRoom"/>
 			<item value="BinaryNode"/>
 			<item value="Executor"/>
-			<item value="HashMap"/>
-			<item value="hashmap"/>
-			<item value="setOnAction"/>
-			<item value="users"/>
-			<item value="newFixedThreadPool"/>
-			<item value="execute"/>
-			<item value=" ThreadPoolExecutor"/>
 		</list>
 		<list key="replacehistory">
+			<item value="line"/>
 			<item value="dout.writeUTF"/>
 			<item value="ft_user"/>
 			<item value=""/>
@@ -33,8 +34,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="2546"/>
-		<item key="DIALOG_Y_ORIGIN" value="390"/>
+		<item key="DIALOG_X_ORIGIN" value="1791"/>
+		<item key="DIALOG_Y_ORIGIN" value="424"/>
 		<item key="DIALOG_WIDTH" value="405"/>
 		<item key="DIALOG_HEIGHT" value="511"/>
 		<item key="DIALOG_FONT_NAME" value="1|Microsoft YaHei UI|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|0|0|Microsoft YaHei UI"/>

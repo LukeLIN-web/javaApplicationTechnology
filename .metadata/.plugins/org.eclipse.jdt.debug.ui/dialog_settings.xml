@@ -11,7 +11,7 @@
 		<item key="uncaughtChecked" value="true"/>
 	</section>
 	<section name="org.eclipse.jdt.internal.debug.ui.ExpressionInformationControlCreator$ExpressionInformationControl">
-		<item key="WIDTH" value="920"/>
+		<item key="WIDTH" value="911"/>
 		<item key="HEIGHT" value="308"/>
 		<item key="SashWeightTree" value="500"/>
 		<item key="SashWeightDetails" value="500"/>

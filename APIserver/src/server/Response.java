@@ -138,7 +138,7 @@ public class Response {
 
 			for (lineNumString lns : res) {
 				System.out.println(lns.str);
-				fos.write((lns.lineNum +" "+lns.str).getBytes());
+				fos.write((lns.lineNum + " " + lns.str).getBytes());
 				fos.write("\r\n".getBytes());
 			}
 			fos.write("\r\n".getBytes());
