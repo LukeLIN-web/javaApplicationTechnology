@@ -184,11 +184,11 @@ public class Response {
 		try {
 			int readLength;
 			if (errcode == 0) {
-//				output.write("HTTP/1.1 200 OK\n".getBytes());
-//				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
-//				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
-//					output.write(buffer, 0, readLength);
-//				}
+				output.write("HTTP/1.1 200 OK\n".getBytes());
+				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
+				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
+					output.write(buffer, 0, readLength);
+				}
 			}
 			if (errcode == -1) {
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n"
