@@ -18,13 +18,14 @@ public class Response {
 	Set<String> operations;
 	String conju;
 	ArrayList<String> allQueries;
+	String headerLine;
 
 	public Response(OutputStream output, Request req) throws IOException {
 		this.output = output;
 		this.request = req;
-//		outputcsv = new File(HttpServer.WEB_ROOT + "\\output.csv");
-		outputcsv = File.createTempFile("tmp-", ".csv");
-		outputcsv.deleteOnExit();
+		outputcsv = new File(HttpServer.WEB_ROOT + "\\output.csv");
+//		outputcsv = File.createTempFile("tmp-", ".csv");
+//		outputcsv.deleteOnExit();
 		allQueries = new ArrayList<String>();
 		operations = new HashSet<String>();
 		operations.add("==");
@@ -66,7 +67,7 @@ public class Response {
 			System.out.println("searching csv...");
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			FileOutputStream fos = new FileOutputStream(outputcsv);
-			String headerLine = br.readLine();
+			headerLine = br.readLine();
 			String[] colName = headerLine.split(csvSplit);
 			for (String col : colName) {
 				fos.write(col.getBytes());
@@ -261,18 +262,14 @@ public class Response {
 				output.write(errMsg.getBytes());
 			}
 			if (errcode == 4) {
-				String content = "<h1>Property does not exist, You can find available Property in csv file</h1>\r\n";
+				String content = "<h1>Property does not exist, available Property is following:</h1>\r\n <h2>"+headerLine + "</h2>\r\n " ;
 				int totallength = content.length();
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
 						+ totallength + "\r\n" + "\r\n" + content;
 				output.write(errMsg.getBytes());
-				output.write("HTTP/1.1 200 OK\n".getBytes());
-				output.write("Content-Type: text/csv; charset=UTF-8\n\n".getBytes()); // http header
-				while ((readLength = fis.read(buffer, 0, BUFFER_SIZE)) > 0) {
-					output.write(buffer, 0, readLength);
-				}
 			}
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 		} finally {
 			if (fis != null) {

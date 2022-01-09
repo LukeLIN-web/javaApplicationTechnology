@@ -62,6 +62,8 @@ The browser as a client can access 127.0.0.1:9527.
 
     If Content-Length is greater than actual length, the server/client will wait for the next byte after reading the end of the message, and naturally there will be no response until the timeout.
 
+   Actually, I met some troubles in send http packet. I learned that HTTP has strict content length constrain. I need use another better way to send HTTP packet. I learned why we need some framework like spring mvc ，spring boot.  
+
 2. when content including `<C1`,  browser can not receive any http data.
 
    I tried `&lt;`.  and use `content.length()` to specify length instead of  100. It worked.
