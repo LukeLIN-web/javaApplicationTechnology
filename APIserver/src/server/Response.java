@@ -258,11 +258,19 @@ public class Response {
 			}
 			if (errcode == -1) {
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n"
-						+ "Content-Length: 23\r\n" + "\r\n" + "<h1>Data File Not Found</h1>";
+						+ "Content-Length: 23\r\n" + "\r\n" + "<h1>Data File Not Found!</h1>";
+				output.write(errMsg.getBytes());
+			}
+			if (errcode == 3) {
+				String content = "<h1>Query From error! Available operations are following:</h1>\r\n"
+						+ "<h2>&= , != , == , $= </h2>\r\n "+"<h2>You need input exactly one space between operations </h2>\r\n ";
+				int totallength = content.length();
+				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
+						+ totallength + "\r\n" + "\r\n" + content;
 				output.write(errMsg.getBytes());
 			}
 			if (errcode == 4) {
-				String content = "<h1>Property does not exist, available Property is following:</h1>\r\n <h2>"+headerLine + "</h2>\r\n " ;
+				String content = "<h1>Property does not exist! Available Properties are following:</h1>\r\n <h2>"+headerLine + "</h2>\r\n " ;
 				int totallength = content.length();
 				String errMsg = "HTTP/1.1 404 File Not Found\r\n" + "Content-Type: text/html\r\n" + "Content-Length: "
 						+ totallength + "\r\n" + "\r\n" + content;
