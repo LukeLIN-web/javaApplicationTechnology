@@ -41,8 +41,6 @@ Service 层:相对具体的业务逻辑服务层。
 
 阿里巴巴规约中的分层比较清晰简单明了，但是描述得还是过于简单了，以及service层和manager层有很多同学还是有点分不清楚之间的关系，就导致了很多项目中根本没有Manager层的存在。
 
-
-
 2月25日, 继续学习spring,还是得看视频, 自己做没人教太难了, 才意识到之前老师教了我多少东西. 
 
 阿里巴巴连接池, druid. 
@@ -81,9 +79,9 @@ dataobject 完全一一映射. 没有逻辑部分,
 
 service不能直接透出dataobject, 要有一个model 概念, 
 
-密码不能直接到前端, 
+密码不能直接到前端, 利用模型组合, `BeanUtils.copyProperties(userModel, userVo);` 
 
-没有setter方法, 就不会自动接受, BeanUtils.copyProperties 可以自动调用setter和getter
+问题: 没有复制过来, 原因是  没有setter方法, 就不会自动接受, BeanUtils.copyProperties 可以自动调用setter和getter
 
 service层组装模型, 
 
@@ -110,3 +108,21 @@ redis有过期时间, 自动覆盖
 otp 和手机号关联, 用http session.
 
 拿到 HttpServletRequest, 通过bean方式注入, 是一个单例模式, 怎么支持多个用户并发? 本质是一个proxy, 内部拥有threadlocal方式的map,去让用户在每个线程中，处理自己对应的request，并且有threadlocal清除的机制.
+
+3月2日
+
+用ajax请求, 前后端分离, 而不是post,
+
+`jQuery(document).ready(*function*()` 渲染好了再做. 
+
+3月3日
+
+跨域问题,
+
+点击了之后没有, 就是浏览器不能执行其他网站的jsp,对象无法获取 Ajax请求发送不出去. 请求的服务器是localhost, ajax 的域是本地文件,认定回调的域不同.
+
+加一个注解即可 `@crossorigin`.
+
+今天学习了css, href, rel 使用css样式控制, 有模板很方便. 
+
+html可以引用css样式, 
