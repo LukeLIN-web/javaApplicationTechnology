@@ -109,6 +109,8 @@ otp 和手机号关联, 用http session.
 
 拿到 HttpServletRequest, 通过bean方式注入, 是一个单例模式, 怎么支持多个用户并发? 本质是一个proxy, 内部拥有threadlocal方式的map,去让用户在每个线程中，处理自己对应的request，并且有threadlocal清除的机制.
 
+#### 前端
+
 3月2日
 
 用ajax请求, 前后端分离, 而不是post,
@@ -117,7 +119,7 @@ otp 和手机号关联, 用http session.
 
 3月3日
 
-跨域问题,
+##### 跨域问题
 
 点击了之后没有, 就是浏览器不能执行其他网站的jsp,对象无法获取 Ajax请求发送不出去. 请求的服务器是localhost, ajax 的域是本地文件,认定回调的域不同.
 
@@ -126,3 +128,22 @@ otp 和手机号关联, 用http session.
 今天学习了css, href, rel 使用css样式控制, 有模板很方便. 
 
 html可以引用css样式, 
+
+3月4日
+
+##### 3-10注册功能
+
+ `insertSelective` 如果是null的话就使用数据库的默认值, 不更新. 
+
+数据库设计尽量使用not null, 默认empty string, int 默认-1 . 
+
+不是所有都用not null, 两个都是null也不影响唯一索引, 
+
+##### 3-11
+
+校验必须发生在离用户最近的地方. 前端后端都要校验. 
+
+点击注册, 没有任何反应 怎么办? 
+
+可能是js的问题
+

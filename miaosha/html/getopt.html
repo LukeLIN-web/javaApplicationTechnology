@@ -38,10 +38,11 @@
                     data:{
                         "telphone":$("#telphone").val(),
                     },
+                    xhrFields:{withCredentials:true},
                     success:function(data){
                         if(data.status == "success"){
                             alert("otp sent successful");
-                            window.location.href="C:/Users/12638/Downloads/5c010a5b00019a7d00000000/register.html"
+                            window.location.href="D:/eclipse/miaosha/html/register.html"
                         }else{
                             alert("sent fail, because "+data.data.errMsg );
                         }

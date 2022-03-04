@@ -8,7 +8,7 @@ public class UserModel {
         this.age = age;
     }
 
-    private Byte gender;
+    private Integer gender;
     private Integer age;
     private String telphone;
     private String registerMode;
@@ -31,7 +31,7 @@ public class UserModel {
         return name;
     }
 
-    public Byte getGender() {
+    public Integer getGender() {
         return gender;
     }
 
@@ -43,7 +43,7 @@ public class UserModel {
         this.name = name;
     }
 
-    public void setGender(Byte gender) {
+    public void setGender(Integer gender) {
         this.gender = gender;
     }
 

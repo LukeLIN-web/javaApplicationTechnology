@@ -24,12 +24,30 @@
             <div class="form-group">
                 <label class="control-label">用户昵称</label>
                 <div>
-                    <input class="form-control" type="text" placeholder="验证码" name="otpCode" id="otpCode">
+                    <input class="form-control" type="text" placeholder="用户昵称" name="name" id="name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">性别</label>
+                <div>
+                    <input class="form-control" type="text" placeholder="性别" name="gender" id="gender">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">年龄</label>
+                <div>
+                    <input class="form-control" type="text" placeholder="年龄" name="age" id="age">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">密码</label>
+                <div>
+                    <input class="form-control" type="password" placeholder="密码" name="password" id="password">
                 </div>
             </div>
             <div class="form-actions">
-                <button class="btn blue" id="getotp" type="submit">
-                    获取opt短信
+                <button class="btn blue" id="register" type="submit">
+                    提交注册
                 </button>
             </div>
         </div>
@@ -39,27 +57,53 @@
             // 绑定otp的click事件用于向后端发送获取手机验证码的请求
             $("#getotp").on("click",function(){
                 var telphone= $("#telphone").val();
+                var password = $("#password").val();
+                var age = $("#age").val();
+                var gender = $("#gender").val();
+                var name = $("#name").val();
+                var otpCode = $("#otpCode").val();
                 if(telphone == null || telphone == ""){
-                    alert("number cannot be empty!");
+                    alert("telphone number cannot be empty!");
+                    return false;
+                }
+                if(password == null || password == ""){
+                    alert("password cannot be empty!");
+                    return false;
+                }
+                if(age == null || age == ""){
+                    alert("age cannot be empty!");
+                    return false;
+                }
+                if(gender == null || gender == ""){
+                    alert("gender cannot be empty!");
+                    return false;
+                }
+                if(otpCode == null || otpCode == ""){
+                    alert("otpCode cannot be empty!");
                     return false;
                 }
                 $.ajax({
                     type:"POST",
                     contentType:"application/x-www-form-urlencoded",
-                    url:"http://localhost:8080/user/getotp",
+                    url:"http://localhost:8080/user/register",
                     data:{
                         "telphone":$("#telphone").val(),
+                        "password":password,
+                        "age":age,
+                        "gender":gender,
+                        "otpCode":otpCode,
+                        "name":name
                     },
+                    xhrFields:{withCredentials:true},
                     success:function(data){
                         if(data.status == "success"){
-                            alert("otp sent successful");
-                            
+                            alert("register successful");
                         }else{
-                            alert("sent fail, because "+data.data.errMsg );
+                            alert("register fail, because "+data.data.errMsg );
                         }
                     },
                     fail:function(data){
-                        alert("otp sent failed, the reason is "+data.responseText);
+                        alert("register failed, the reason is "+data.responseText);
                     }
                 });
                 return false;
